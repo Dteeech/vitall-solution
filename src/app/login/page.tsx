@@ -13,7 +13,7 @@ export default function LoginPage() {
         </div>
 
         {/* Right form area */}
-        <div className="p-10 flex flex-col justify-center">
+        <div className="p-10 flex flex-col justify-around">
           <div className="flex justify-end mb-6">
             <div className="text-right">
               <Image src="/logo-N&B.png" alt="Vitall" width={64} height={64} />

@@ -9,7 +9,7 @@ export function SecondaryButton({ label, onClick, className = '' }: SecondaryPro
     <button
       type="button"
       onClick={onClick}
-  className={`inline-flex items-center justify-center gap-2 px-4 py-2 bg-neutral-100 hover:bg-neutral-200 text-foreground font-medium rounded-md transition-colors duration-200 ${className}`}
+  className={`inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary hover:bg- text-foreground font-medium rounded-md transition-colors duration-200 ${className}`}
     >
       {label}
     </button>

@@ -3,6 +3,7 @@ type Props = {
   onClick?: () => void
   withIcons?: boolean
   className?: string
+  type?: 'button' | 'submit' | 'reset'
 }
 
 function PlusIcon({ size = 18 }: { size?: number }) {
@@ -22,12 +23,12 @@ function PlusIcon({ size = 18 }: { size?: number }) {
   )
 }
 
-export function PrimaryButton({ label, onClick, withIcons = true, className = '' }: Props) {
+export function PrimaryButton({ label, onClick, withIcons = true, className = '', type = 'button' }: Props) {
   return (
     <button
-      type="button"
+      type={type}
       onClick={onClick}
-  className={`inline-flex items-center justify-center gap-2 px-6 py-2 bg-primary hover:bg-primary-dark text-white font-semibold text-lg rounded-xl transition-colors duration-200 ${className}`}
+  className={`inline-flex items-center justify-center gap-2 px-6 py-2 bg-primary-500 hover:bg-primary-300 text-white font-semibold text-lg rounded-xl transition-colors duration-200 ${className}`}
     >
       {withIcons && <PlusIcon />}
       <span>{label}</span>

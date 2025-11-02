@@ -1,47 +1,35 @@
 import Sidebar from '@/components/ui/Sidebar'
 import { Card } from '@/components/ui'
 
-export default function AdminDashboard() {
+export default function RecruiterHome() {
   return (
     <div className="min-h-screen bg-neutral-50 flex">
       <Sidebar />
 
       <main className="flex-1 p-8">
         <header className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Bonjour [Prénom]</h1>
-          <div className="flex items-center gap-4">
-            <div className="text-sm">Martin Delcourt<br/><span className="text-foreground text-xs">martin.delcourt@email.com</span></div>
+          <h1 className="text-2xl font-bold">Mes modules</h1>
+          <div>
+            <button className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-md">+ Ajouter un module</button>
           </div>
         </header>
 
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          <Card title="Nouvelles candidatures">
-            <div className="text-4xl font-bold">5</div>
-            <button className="mt-4 inline-flex items-center gap-2 px-3 py-1 bg-primary text-foreground rounded-md">Ajouter</button>
-          </Card>
-
-          <Card title="Candidatures en cours">
-            <div className="text-4xl font-bold">5</div>
-          </Card>
-
-          <Card title="Demandes de transfert">
-            <div className="text-4xl font-bold">5</div>
-          </Card>
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="p-4 bg-white rounded-lg shadow-sm flex flex-col items-center gap-3">
+              <div className="w-12 h-12 bg-secondary rounded-full" />
+              <div className="text-sm font-medium">[Nom module]</div>
+              <button className="mt-2 px-3 py-1 border border-primary text-primary rounded-md">Ouvrir</button>
+            </div>
+          ))}
         </section>
 
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <Card title="Taux d'acceptation sur l'année civile">
-              <div className="h-48 bg-neutral-100" />
-            </Card>
+        <footer className="mt-8">
+          <div className="flex items-center justify-between">
+            <div>Résultat par page</div>
+            <div>Pagination</div>
           </div>
-
-          <div>
-            <Card title="Répartition des statuts">
-              <div className="h-48 bg-neutral-100" />
-            </Card>
-          </div>
-        </section>
+        </footer>
       </main>
     </div>
   )

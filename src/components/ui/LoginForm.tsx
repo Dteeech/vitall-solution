@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { TextInput } from './TextInput'
 import { PrimaryButton } from './PrimaryButton'
+import { SecondaryButton } from './SecondaryButton'
 
 export default function LoginForm() {
   const [identifier, setIdentifier] = useState('')
@@ -18,24 +19,24 @@ export default function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-md">
       <h2 className="text-2xl font-bold mb-2">Connexion</h2>
-  <p className="text-sm text-foreground mb-6">Saisissez vos identifiants pour accéder à votre compte.</p>
+      <p className="text-sm text-neutral-dark mb-6">Saisissez vos identifiants pour accéder à votre compte.</p>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">Identifiant <span className="text-error">*</span></label>
+        <label className="block text-sm font-medium mb-1 text-neutral-dark">Identifiant <span className="text-danger">*</span></label>
         <TextInput placeholder="Placeholder" value={identifier} onChange={(e) => setIdentifier(e.target.value)} />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">Mot de passe <span className="text-error">*</span></label>
+        <label className="block text-sm font-medium mb-1 text-neutral-dark">Mot de passe <span className="text-danger">*</span></label>
         <TextInput placeholder="Placeholder" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
       </div>
 
       <div className="flex items-center gap-2 mb-6">
         <input id="remember" type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="h-4 w-4" />
-  <label htmlFor="remember" className="text-sm text-foreground">Se souvenir de mon mot de passe</label>
+        <label htmlFor="remember" className="text-sm text-neutral-dark">Se souvenir de mon mot de passe</label>
       </div>
 
-  <PrimaryButton label="Connexion" withIcons={false} />
+      <PrimaryButton label="Connexion" type="submit" className="w-full" />
     </form>
   )
 }

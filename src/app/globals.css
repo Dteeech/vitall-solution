@@ -1,50 +1,71 @@
+/* === Tailwind v4.1 setup === */
 @import "tailwindcss";
 
-/* === Font Abadi MT Pro (Bold) === */
+/* === Définition du thème === */
+@theme {
+  /* === Palette primaire (orange) === */
+  --color-primary-25: #FFF8F3;
+  --color-primary-50: #FFF0E4;
+  --color-primary-100: #FFE3CF;
+  --color-primary-200: #FFD1B0;
+  --color-primary-300: #FFBB8C;
+  --color-primary-400: #FCBE8D;
+  --color-primary-500: #FDA070;
+  --color-primary-600: #F29B63;
+  --color-primary-700: #EA8B49;
+  --color-primary-800: #C86B2F;
+  --color-primary-900: #9D4C1B;
+
+  /* === Palette secondaire (bleu) === */
+  --color-secondary-25: #F6F9FB;
+  --color-secondary-50: #EAF1F9;
+  --color-secondary-100: #D3E1EB;
+  --color-secondary-200: #B8CDD9;
+  --color-secondary-300: #9AB6C6;
+  --color-secondary-400: #86A5B7;
+  --color-secondary-500: #7195AA;
+  --color-secondary-600: #55758A;
+  --color-secondary-700: #38546A;
+  --color-secondary-800: #203B55;
+  --color-secondary-900: #132E49;
+
+  /* === Polices === */
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-heading: 'Abadi MT Pro', Georgia, serif;
+}
+
+/* === Font custom === */
 @font-face {
   font-family: 'Abadi MT Pro';
   src: url('/fonts/AbadiMTPro-Bold/AbadiMTPro-Bold.woff2') format('woff2'),
-       url('/fonts/AbadiMTPro-Bold/AbadiMTPro-Bold.woff') format('woff');
+    url('/fonts/AbadiMTPro-Bold/AbadiMTPro-Bold.woff') format('woff');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 
-/* 🎨 Design Tokens — Vitall */
+/* === Variables globales === */
 :root {
-  --background: #ffffff;
+  --background: #FFFFFF;
   --foreground: #000000;
-
-  --color-primary: #ea8b48;
-  --color-primary-dark: #9e4d1c;
-  --color-primary-light: #ffba8c;
-
-  --color-blue-900: #132f49;
-  --color-neutral-100: #f5f5f5;
-
-  --color-error: #e00808;
-  --color-success: #7db06b;
-
-  --font-heading: 'Abadi MT Pro', 'Georgia', serif;
 }
 
-/* 🌗 Dark mode (activé avec <html class="dark"> ou <body class="dark">) */
-.dark {
-  --background: #0a0a0a;
-  --foreground: #ffffff;
-}
-
-/* 🧱 Styles de base */
+/* === Styles de base === */
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-poppins, Inter, system-ui, sans-serif);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
-/* 🧩 Titres */
-h1, h2, h3, h4, h5, h6 {
+/* === Titres === */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-heading);
 }

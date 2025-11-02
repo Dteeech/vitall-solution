@@ -28,7 +28,7 @@ function IconGrid({ className = '' }: { className?: string }) {
 export default function Sidebar() {
   const pathname = usePathname() || '/'
   const [modulesOpen, setModulesOpen] = useState(
-    pathname.startsWith('/recruiter') || pathname.startsWith('/planning') || pathname.startsWith('/formation')
+    pathname.startsWith('/recruit-firefighter') || pathname.startsWith('/planning') || pathname.startsWith('/formation')
   )
 
   const items = [
@@ -39,14 +39,14 @@ export default function Sidebar() {
     label: 'Mes modules',
     icon: <IconPuzzle className="text-white" />,
     children: [
-      { label: 'Recrutement', href: '/recruiter' },
+      { label: 'Recrutement', href: '/admin/modules/recruit-firefighter' },
       { label: 'Planning', href: '/planning' },
       { label: 'Formation', href: '/formation' },
     ],
   }
 
   return (
-    <aside className="w-64 bg-blue-900 text-white min-h-screen p-6 hidden md:flex flex-col gap-6 rounded-tr-3xl rounded-br-3xl">
+    <aside className="w-64 bg-black text-white min-h-screen p-6 hidden md:flex flex-col gap-6 rounded-tr-3xl rounded-br-3xl">
       {/* Logo */}
       <div className="flex flex-col items-center gap-4">
         <div className="w-full flex items-center justify-center">
@@ -80,9 +80,8 @@ export default function Sidebar() {
             <button
               onClick={() => setModulesOpen((s: boolean) => !s)}
               aria-expanded={modulesOpen}
-              className={`w-full flex items-center justify-between gap-3 px-4 py-2 rounded-md transition-colors duration-150 ${
-                modulesOpen ? 'bg-white text-blue-900' : 'hover:bg-white/5 text-white'
-              }`}
+              className={`w-full flex items-center justify-between gap-3 px-4 py-2 rounded-md transition-colors duration-150 ${modulesOpen ? 'bg-white text-blue-900' : 'hover:bg-white/5 text-white'
+                }`}
             >
               <span className="flex items-center gap-3">
                 <span className="shrink-0">{modules.icon}</span>
@@ -107,9 +106,8 @@ export default function Sidebar() {
                     <li key={child.href}>
                       <Link
                         href={child.href}
-                        className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors duration-150 ${
-                          active ? 'bg-white text-blue-900' : 'hover:bg-white/5 text-white/90'
-                        }`}
+                        className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors duration-150 ${active ? 'bg-white text-blue-900' : 'hover:bg-white/5 text-white/90'
+                          }`}
                       >
                         <span className="shrink-0 inline-block w-5 h-5 text-primary-token">
                           <IconPeopleImg alt={child.label} />

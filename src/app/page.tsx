@@ -1,67 +1,28 @@
-'use client';
-import Image from "next/image";
-import { PrimaryButton } from "@/components/ui";
+import Image from 'next/image'
+import LoginForm from '@/components/ui/LoginForm'
 
-export default function Home() {
+export default function LoginPage() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
+    <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+      <div className="w-full max-w-6xl bg-white shadow-sm rounded-lg overflow-hidden grid grid-cols-1 md:grid-cols-2">
+        {/* Left artwork */}
+  <div className="hidden md:flex bg-primary-softer p-8 items-center justify-start w-full">
+          <div className="min-w-[520px] h-full max-w-xs">
+            <Image src="/bg/bg-connexion.jpg" alt="Illustration" width={620} height={920} className="object-cover rounded-2xl w-full" />
+          </div>
+        </div>
 
+        {/* Right form area */}
+        <div className="p-10 flex flex-col justify-around">
+          <div className="flex justify-end mb-6">
+            <div className="text-right">
+              <Image src="/logo-N&B.png" alt="Vitall" width={64} height={64} />
+            </div>
+          </div>
 
-        <h1 className="text-3xl font-bold underline hover:text-blue-600">
-          Hello world!
-        </h1>
-
-        <PrimaryButton label="Tester" onClick={() => console.log('clicked')} />
-          
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <LoginForm />
+        </div>
+      </div>
     </div>
-  );
+  )
 }

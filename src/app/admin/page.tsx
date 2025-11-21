@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import Sidebar from '@/components/ui/Sidebar'
 import ConfirmationModal from '@/components/ui/ConfirmationModal'
 import { IconButton } from '@/components/ui'
 
@@ -28,19 +27,16 @@ export default function RecruiterHome() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 flex">
-      <Sidebar />
-
-      <main className="flex-1 p-8">
-        <header className="flex items-center justify-between mb-6">
-          <div className="flex flex-col gap-4">
-            <h1 className="text-4xl font-bold pb-4">Mes modules</h1>
-            <span>7 modules</span>
-            <IconButton label="Ajouter un module" onClick={() => alert('Ajouter un module (mock)')} className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-md">
+    <main className="flex-1 p-8">
+      <header className="flex items-center justify-between mb-6">
+        <div className="flex flex-col gap-4">
+          <h1 className="text-4xl font-bold pb-4">Mes modules</h1>
+          <span>7 modules</span>
+          <IconButton label="Ajouter un module" onClick={() => alert('Ajouter un module (mock)')} className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-md">
             <p>Ajouter un module</p>
-        </IconButton>
-    </div>
-        </header >
+          </IconButton>
+        </div>
+      </header>
 
         <section className="grid grid-cols-2 md:grid-cols-3 gap-6">
 
@@ -51,10 +47,10 @@ export default function RecruiterHome() {
               <p className="absolute right-4 p-2 rounded bg-[#86A5B7] text-white">Inclus</p>
             </div>
             <div className='w-full gap-4 flex align-center justify-start'>
-            <button className="px-3 py-1 h-full border border-primary-500 text-primary-500 rounded-md">Ouvrir</button>
-            <button onClick={() => openDeleteModal('recrutement')} className="ml-2 p-2 rounded-md hover:bg-red-100">
-              <img src="/icons/bin.svg" alt="Supprimer le module" className="w-5 h-5" />
-            </button>
+              <button className="px-3 py-1 h-full border border-primary-500 text-primary-500 rounded-md">Ouvrir</button>
+              <button onClick={() => openDeleteModal('recrutement')} className="ml-2 p-2 rounded-md hover:bg-red-100">
+                <img src="/icons/bin.svg" alt="Supprimer le module" className="w-5 h-5" />
+              </button>
             </div>
           </div>
           <div className="h-auto min-h-[180px] p-4 bg-white rounded-lg shadow-sm flex flex-col items-center gap-3 relative justify-around">
@@ -64,10 +60,10 @@ export default function RecruiterHome() {
               <p className="absolute right-4 p-2 rounded bg-[#86A5B7] text-white">Inclus</p>
             </div>
             <div className='w-full gap-4 flex align-center justify-start'>
-            <button className="px-3 py-1 h-full border border-primary-500 text-primary-500 rounded-md">Ouvrir</button>
-            <button onClick={() => openDeleteModal('recrutement')} className="ml-2 p-2 rounded-md hover:bg-red-100">
-              <img src="/icons/bin.svg" alt="Supprimer le module" className="w-5 h-5" />
-            </button>
+              <button className="px-3 py-1 h-full border border-primary-500 text-primary-500 rounded-md">Ouvrir</button>
+              <button onClick={() => openDeleteModal('recrutement')} className="ml-2 p-2 rounded-md hover:bg-red-100">
+                <img src="/icons/bin.svg" alt="Supprimer le module" className="w-5 h-5" />
+              </button>
             </div>
           </div>
           <div className="h-auto min-h-[180px] p-4 bg-white rounded-lg shadow-sm flex flex-col items-center gap-3 relative justify-around">
@@ -77,10 +73,10 @@ export default function RecruiterHome() {
               <p className="absolute right-4 p-2 rounded bg-[#86A5B7] text-white">Inclus</p>
             </div>
             <div className='w-full gap-4 flex align-center justify-start'>
-            <button className="px-3 py-1 h-full border border-primary-500 text-primary-500 rounded-md">Ouvrir</button>
-            <button onClick={() => openDeleteModal('recrutement')} className="ml-2 p-2 rounded-md hover:bg-red-100">
-              <img src="/icons/bin.svg" alt="Supprimer le module" className="w-5 h-5" />
-            </button>
+              <button className="px-3 py-1 h-full border border-primary-500 text-primary-500 rounded-md">Ouvrir</button>
+              <button onClick={() => openDeleteModal('recrutement')} className="ml-2 p-2 rounded-md hover:bg-red-100">
+                <img src="/icons/bin.svg" alt="Supprimer le module" className="w-5 h-5" />
+              </button>
             </div>
           </div>
         </section>
@@ -91,16 +87,16 @@ export default function RecruiterHome() {
             <div>Pagination</div>
           </div>
         </footer>
-      </main >
-    <ConfirmationModal
-      open={confirmOpen}
-      title="Supprimer le module"
-      message={`Voulez-vous supprimer "${pendingModule ?? ''}" ?`}
-      confirmLabel="Supprimer"
-      cancelLabel="Annuler"
-      onConfirm={handleConfirmDelete}
-      onCancel={handleCancel}
-    />
-    </div >
+
+      <ConfirmationModal
+        open={confirmOpen}
+        title="Supprimer le module"
+        message={`Voulez-vous supprimer "${pendingModule ?? ''}" ?`}
+        confirmLabel="Supprimer"
+        cancelLabel="Annuler"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancel}
+      />
+    </main>
   )
 }

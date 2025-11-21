@@ -1,4 +1,4 @@
-import Sidebar from '@/components/ui/Sidebar'
+import { Sidebar } from '@/components/ui/Sidebar'
 import { Card } from '@/components/ui'
 
 export default function CandidatesList() {

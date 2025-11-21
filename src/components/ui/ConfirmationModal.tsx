@@ -32,7 +32,7 @@ export default function ConfirmationModal({
 
         <div className="flex items-center justify-end gap-3">
           <button onClick={onCancel} className="px-4 py-2 rounded-md border  border-neutral-200">{cancelLabel}</button>
-          <button onClick={onConfirm} className="px-4 py-2 rounded-md bg-primary bg-red-500 text-white">{confirmLabel}</button>
+          <button onClick={onConfirm} className="px-4 py-2 rounded-md bg-primary text-white">{confirmLabel}</button>
         </div>
       </div>
     </div>

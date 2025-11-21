@@ -1,4 +1,4 @@
-import Sidebar from '@/components/ui/Sidebar'
+import { Sidebar } from '@/components/ui/Sidebar'
 import { Card, PrimaryButton } from '@/components/ui'
 import Link from 'next/link'
 

@@ -1,12 +1,11 @@
-import { Sidebar } from '@/components/ui/Sidebar'
+
+
 import { Card, PrimaryButton } from '@/components/ui'
 import Link from 'next/link'
 
 export default function AdminDashboardFirefighter() {
   return (
     <div className="min-h-screen bg-neutral-light/20 flex">
-      <Sidebar />
-
       <main className="flex-1 p-8 text-neutral-dark">
         <header className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">Bonjour [Prénom]</h1>

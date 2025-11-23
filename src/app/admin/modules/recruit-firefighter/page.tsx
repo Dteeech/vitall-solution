@@ -1,6 +1,6 @@
 
 
-import { Card, PrimaryButton } from '@/components/ui'
+import { Card } from '@/components/ui'
 import Link from 'next/link'
 
 export default function AdminDashboardFirefighter() {

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import ConfirmationModal from '@/components/ui/ConfirmationModal'
 import { IconButton } from '@/components/ui'
+import Link from "next/link"
 
 export default function RecruiterHome() {
 
@@ -39,55 +40,55 @@ export default function RecruiterHome() {
         </div>
       </header>
 
-        <section className="grid grid-cols-2 md:grid-cols-3 gap-6">
+      <section className="grid grid-cols-2 md:grid-cols-3 gap-6">
 
-          <div className="h-auto min-h-[180px] p-4 bg-white rounded-lg shadow-sm flex flex-col items-center gap-3 relative justify-around">
-            <div className="w-full h-12 bg-secondary rounded-full flex  gap-4" >
-              <Image src="/icons/recrutement.svg" alt="Icône Recrutement" className="w-8 h-8" width={32} height={32} />
-              <div className="text-sm font-medium">Recrutement</div>
-              <p className="absolute right-4 p-2 rounded bg-[#86A5B7] text-white">Inclus</p>
-            </div>
-            <div className='w-full gap-4 flex align-center justify-start'>
-              <button className="px-3 py-1 h-full border border-primary-500 text-primary-500 rounded-md">Ouvrir</button>
-              <button onClick={() => openDeleteModal('recrutement')} className="ml-2 p-2 rounded-md hover:bg-red-100">
-                <img src="/icons/bin.svg" alt="Supprimer le module" className="w-5 h-5" />
-              </button>
-            </div>
+        <div className="h-auto min-h-[180px] p-4 bg-white rounded-lg shadow-sm flex flex-col items-center gap-3 relative justify-around">
+          <div className="w-full h-12 bg-secondary rounded-full flex  gap-4" >
+            <img src="/icons/recrutement.svg" alt="Icône Recrutement" className="w-8 h-8" />
+            <div className="text-sm font-medium">Recrutement</div>
+            <p className="absolute right-4 p-2 rounded bg-[#86A5B7] text-white">Inclus</p>
           </div>
-          <div className="h-auto min-h-[180px] p-4 bg-white rounded-lg shadow-sm flex flex-col items-center gap-3 relative justify-around">
-            <div className="w-full h-12 bg-secondary rounded-full flex  gap-4" >
-              <Image src="/icons/Planning.svg" alt="Icône Recrutement" className="w-8 h-8" width={32} height={32} />
-              <div className="text-sm font-medium">Planning</div>
-              <p className="absolute right-4 p-2 rounded bg-[#86A5B7] text-white">Inclus</p>
-            </div>
-            <div className='w-full gap-4 flex align-center justify-start'>
-              <button className="px-3 py-1 h-full border border-primary-500 text-primary-500 rounded-md">Ouvrir</button>
-              <button onClick={() => openDeleteModal('recrutement')} className="ml-2 p-2 rounded-md hover:bg-red-100">
-                <Image src="/icons/bin.svg" alt="Supprimer le module" className="w-5 h-5" width={20} height={20} />
-              </button>
-            </div>
+          <div className='w-full gap-4 flex align-center justify-start'>
+            <button className="px-3 py-1 h-full border border-primary-500 text-primary-500 rounded-md">Ouvrir</button>
+            <button onClick={() => openDeleteModal('recrutement')} className="ml-2 p-2 rounded-md hover:bg-red-100">
+              <img src="/icons/bin.svg" alt="Supprimer le module" className="w-5 h-5" />
+            </button>
           </div>
-          <div className="h-auto min-h-[180px] p-4 bg-white rounded-lg shadow-sm flex flex-col items-center gap-3 relative justify-around">
-            <div className="w-full h-12 bg-secondary rounded-full flex  gap-4" >
-              <Image src="/icons/recrutement.svg" alt="Icône Recrutement" className="w-8 h-8" width={32} height={32} />
-              <div className="text-sm font-medium">Formation</div>
-              <p className="absolute right-4 p-2 rounded bg-[#86A5B7] text-white">Inclus</p>
-            </div>
-            <div className='w-full gap-4 flex align-center justify-start'>
-              <button className="px-3 py-1 h-full border border-primary-500 text-primary-500 rounded-md">Ouvrir</button>
-              <button onClick={() => openDeleteModal('recrutement')} className="ml-2 p-2 rounded-md hover:bg-red-100">
-                <Image src="/icons/bin.svg" alt="Supprimer le module" className="w-5 h-5" width={20} height={20} />
-              </button>
-            </div>
+        </div>
+        <div className="h-auto min-h-[180px] p-4 bg-white rounded-lg shadow-sm flex flex-col items-center gap-3 relative justify-around">
+          <div className="w-full h-12 bg-secondary rounded-full flex  gap-4" >
+            <img src="/icons/Planning.svg" alt="Icône Recrutement" className="w-8 h-8" />
+            <div className="text-sm font-medium">Planning</div>
+            <p className="absolute right-4 p-2 rounded bg-[#86A5B7] text-white">Inclus</p>
           </div>
-        </section>
+          <div className='w-full gap-4 flex align-center justify-start'>
+            <button className="px-3 py-1 h-full border border-primary-500 text-primary-500 rounded-md">Ouvrir</button>
+            <button onClick={() => openDeleteModal('recrutement')} className="ml-2 p-2 rounded-md hover:bg-red-100">
+              <img src="/icons/bin.svg" alt="Supprimer le module" className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+        <div className="h-auto min-h-[180px] p-4 bg-white rounded-lg shadow-sm flex flex-col items-center gap-3 relative justify-around">
+          <div className="w-full h-12 bg-secondary rounded-full flex  gap-4" >
+            <img src="/icons/recrutement.svg" alt="Icône Recrutement" className="w-8 h-8" />
+            <div className="text-sm font-medium">Formation</div>
+            <p className="absolute right-4 p-2 rounded bg-[#86A5B7] text-white">Inclus</p>
+          </div>
+          <div className='w-full gap-4 flex align-center justify-start'>
+            <button className="px-3 py-1 h-full border border-primary-500 text-primary-500 rounded-md">Ouvrir</button>
+            <button onClick={() => openDeleteModal('recrutement')} className="ml-2 p-2 rounded-md hover:bg-red-100">
+              <img src="/icons/bin.svg" alt="Supprimer le module" className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      </section>
 
-        <footer className="mt-8">
-          <div className="flex items-center justify-between">
-            <div>Résultat par page</div>
-            <div>Pagination</div>
-          </div>
-        </footer>
+      <footer className="mt-8">
+        <div className="flex items-center justify-between">
+          <div>Résultat par page</div>
+          <div>Pagination</div>
+        </div>
+      </footer>
 
       <ConfirmationModal
         open={confirmOpen}

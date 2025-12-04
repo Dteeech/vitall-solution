@@ -50,7 +50,7 @@ const MAIN_MENU_ITEMS: MenuItem[] = [
   },
   {
     title: "Recrutement",
-    iconSrc: "/icons/recrutement.svg",
+    iconSrc: "/assets/icons/recrutement.svg",
     subItems: [
       { title: "Candidatures", href: "/admin/modules/recruit-firefighter/candidates", isActive: true },
       { title: "Casernes", href: "/admin/casernes" },
@@ -61,7 +61,7 @@ const MAIN_MENU_ITEMS: MenuItem[] = [
   },
   {
     title: "Planning",
-    iconSrc: "/icons/Planning.svg",
+    iconSrc: "/assets/icons/Planning.svg",
     subItems: [
      {title: "sous menu", href:"/"},  
      {title: "sous menu", href:"/"},  
@@ -114,7 +114,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar
       collapsible="icon"
-      className="bg-[#132e49] border-none text-white"
+      className="bg-secondary-900 border-none text-white"
       {...props}
     >
       <SidebarHeader className="pt-10 pb-6">
@@ -229,7 +229,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <div className={item.badge ? "relative" : ""}>
                       <item.icon className="size-5" />
                       {item.badge && (
-                        <span className="absolute -top-1 -right-1 size-2 bg-red-600 rounded-full" />
+                        <span className="absolute -top-1 -right-1 size-2 bg-destructive rounded-full" />
                       )}
                     </div>
                   )}

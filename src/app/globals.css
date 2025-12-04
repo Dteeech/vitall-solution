@@ -40,8 +40,8 @@
 /* === Font custom === */
 @font-face {
   font-family: 'Abadi MT Pro';
-  src: url('/fonts/AbadiMTPro-Bold/AbadiMTPro-Bold.woff2') format('woff2'),
-    url('/fonts/AbadiMTPro-Bold/AbadiMTPro-Bold.woff') format('woff');
+  src: url('/assets/fonts/AbadiMTPro-Bold/AbadiMTPro-Bold.woff2') format('woff2'),
+    url('/assets/fonts/AbadiMTPro-Bold/AbadiMTPro-Bold.woff') format('woff');
   font-weight: 700;
   font-style: normal;
   font-display: swap;

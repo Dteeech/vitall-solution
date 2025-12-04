@@ -6,9 +6,9 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-neutral-50">
       <div className="w-full max-w-6xl bg-white shadow-sm rounded-lg overflow-hidden grid grid-cols-1 md:grid-cols-2">
         {/* Left artwork */}
-  <div className="hidden md:flex bg-primary-softer p-8 items-center justify-start w-full">
-          <div className="min-w-[520px] h-full max-w-xs">
-            <Image src="/bg/bg-connexion.jpg" alt="Illustration" width={620} height={920} className="object-cover rounded-2xl w-full" />
+        <div className="hidden md:flex bg-primary-softer p-8 items-center justify-start w-full ">
+          <div className="relative min-w-[520px] h-[650px] max-w-xs overflow-hidden rounded-2xl">
+            <Image src="/assets/images/onboarding.png" alt="Illustration" fill className="object-cover w-full h-full" />
           </div>
         </div>
 
@@ -16,7 +16,7 @@ export default function LoginPage() {
         <div className="p-10 flex flex-col justify-around">
           <div className="flex justify-end mb-6">
             <div className="text-right">
-              <Image src="/logo-N&B.png" alt="Vitall" width={64} height={64} />
+              <Image src="/assets/images/logo-N&B.png" alt="Vitall" width={64} height={64} />
             </div>
           </div>
 

@@ -64,11 +64,9 @@ const MAIN_MENU_ITEMS: MenuItem[] = [
     title: "Planning",
     iconSrc: "/assets/icons/Planning.svg",
     subItems: [
-      { title: "astreintes", href: "/admin/planning/astreintes" },
-      { title: "sous menu", href: "/" },
-      { title: "sous menu", href: "/" },
-      { title: "sous menu", href: "/" },
-      { title: "sous menu", href: "/" },
+      { title: "Planning", href: "/admin/planning" },
+      { title: "Astreintes", href: "/admin/planning/astreintes" },
+      { title: "Données analytiques", href: "/admin/planning/donnees-analytiques" },
     ],
   },
   {
@@ -163,7 +161,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     ? () => toggleMenu(item.title)
                     : undefined
                 }
-                className="text-white hover:bg-secondary-700 font-semibold group-data-[state=collapsed]:justify-center"
+                className={`text-white hover:bg-secondary-700 font-semibold group-data-[state=collapsed]:justify-center ${
+                  item.href && pathname === item.href ? "bg-secondary-700" : ""
+                }`}
               >
                 {item.href ? (
                   <Link href={item.href}>

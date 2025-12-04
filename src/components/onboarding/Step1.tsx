@@ -1,11 +1,18 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
+import { CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+type WizardData = {
+  field1?: string;
+  field2?: string;
+  field3?: string;
+  field4?: string;
+};
+
 interface StepProps {
-  data: any;
-  updateData: (key: string, value: any) => void;
+  data: WizardData;
+  updateData: (key: keyof WizardData, value: string) => void;
 }
 
 const Step1: React.FC<StepProps> = ({ data, updateData }) => {

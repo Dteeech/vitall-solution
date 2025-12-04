@@ -10,6 +10,8 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  useDroppable,
+  useDraggable,
 } from "@dnd-kit/core"
 
 type Candidate = {
@@ -244,7 +246,6 @@ function KanbanColumn({
   status: Candidate["status"]
   candidates: Candidate[]
 }) {
-  const { useDroppable } = require("@dnd-kit/core")
   const { setNodeRef } = useDroppable({ id: status })
 
   return (
@@ -285,7 +286,6 @@ function CandidateCard({
   candidate: Candidate
   isDragging?: boolean
 }) {
-  const { useDraggable } = require("@dnd-kit/core")
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: candidate.id,
   })

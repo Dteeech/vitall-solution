@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { TextInput } from './TextInput'
 import { PrimaryButton } from './PrimaryButton'
 
-
 export default function LoginForm() {
   const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')

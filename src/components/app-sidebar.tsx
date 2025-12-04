@@ -64,22 +64,22 @@ const MAIN_MENU_ITEMS: MenuItem[] = [
     title: "Planning",
     iconSrc: "/assets/icons/Planning.svg",
     subItems: [
-     {title: "astreintes", href:"/admin/planning/astreintes"},  
-     {title: "sous menu", href:"/"},  
-     {title: "sous menu", href:"/"},  
-     {title: "sous menu", href:"/"},  
-     {title: "sous menu", href:"/"},  
+      { title: "astreintes", href: "/admin/planning/astreintes" },
+      { title: "sous menu", href: "/" },
+      { title: "sous menu", href: "/" },
+      { title: "sous menu", href: "/" },
+      { title: "sous menu", href: "/" },
     ],
   },
   {
     title: "Congés",
     icon: Users,
     subItems: [
-     {title: "sous menu", href:"/"},  
-     {title: "sous menu", href:"/"},  
-     {title: "sous menu", href:"/"},  
-     {title: "sous menu", href:"/"},  
-     {title: "sous menu", href:"/"},  
+      { title: "sous menu", href: "/" },
+      { title: "sous menu", href: "/" },
+      { title: "sous menu", href: "/" },
+      { title: "sous menu", href: "/" },
+      { title: "sous menu", href: "/" },
     ],
   },
 ]
@@ -130,13 +130,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     >
       <SidebarHeader className="pt-10 pb-6">
         <div className="flex justify-center px-4">
-          <Image
-            src="/Logo-Blanc-avec-texte.png"
-            alt="Vitall"
-            width={108}
-            height={32}
-            className="object-contain group-data-[collapsible=icon]:hidden"
-          />
+          <Link href="/dashboard">
+            <Image
+              src="/Logo-Blanc-avec-texte.png"
+              alt="Vitall"
+              width={108}
+              height={32}
+              className="object-contain group-data-[collapsible=icon]:hidden"
+            />
+          </Link>
           <Image
             src="/icons/small-vitall-icon-sidebar-closed.svg"
             alt="Vitall"
@@ -204,7 +206,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   </>
                 )}
               </SidebarMenuButton>
-                  {item.subItems && item.subItems.length > 0 && openMenus[item.title] && (
+              {item.subItems && item.subItems.length > 0 && openMenus[item.title] && (
                 <SidebarMenuSub className="border-l border-white/20 ml-3">
                   {item.subItems.map((subItem) => {
                     const active = pathname === subItem.href || pathname.startsWith(`${subItem.href}/`)

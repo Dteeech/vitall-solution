@@ -92,7 +92,7 @@ export default function AstreintesPage() {
       <div>
         <Button
           onClick={() => setIsGlobalModalOpen(true)}
-          className="bg-[#ea8b49] hover:bg-[#ea8b49]/90 text-white gap-2 px-4 py-2 rounded-lg"
+          className="bg-primary-700 hover:bg-primary-700/90 text-white gap-2 px-4 py-2 rounded-lg"
         >
           <Plus className="h-4 w-4" />
           Ajouter une astreinte
@@ -100,7 +100,8 @@ export default function AstreintesPage() {
       </div>
 
       {/* Calendar */}
-      <div className="rounded-2xl shadow-sm border border-[#f1f1f1] overflow-hidden">
+      <div className="overflow-x-auto">
+      <div className="min-w-[720px] rounded-2xl shadow-sm border border-[#f1f1f1] overflow-hidden">
         {/* Calendar Header */}
         <div className="grid grid-cols-7 bg-white">
           {daysOfWeek.map((day, index) => (
@@ -124,7 +125,7 @@ export default function AstreintesPage() {
               key={index}
               onClick={() => handleDayClick(day)}
               className={`
-                min-h-[153px] p-4 border border-[#f1f1f1] flex flex-col justify-between
+                min-h-[120px] md:min-h-[153px] p-3 md:p-4 border border-[#f1f1f1] flex flex-col justify-between
                 ${day.isCurrentMonth ? "bg-white cursor-pointer hover:bg-gray-50" : "bg-[#f4f4f4]"}
                 ${!day.isCurrentMonth ? "opacity-40" : ""}
                 ${index === calendarDays.length - 7 ? "rounded-bl-2xl" : ""}
@@ -155,6 +156,7 @@ export default function AstreintesPage() {
             </div>
           ))}
         </div>
+      </div>
       </div>
 
       {/* Global Add Modal */}
@@ -188,7 +190,7 @@ export default function AstreintesPage() {
 
                 <Button
                   variant="outline"
-                  className="border-[#ea8b49] text-[#ea8b49] hover:bg-[#ea8b49]/10 w-fit"
+                  className="border-primary-700 text-primary-700 hover:bg-primary-700/10 w-fit"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Ajouter
@@ -234,11 +236,11 @@ export default function AstreintesPage() {
             <Button
               variant="ghost"
               onClick={() => setIsGlobalModalOpen(false)}
-              className="text-[#ea8b49]"
+              className="text-primary-700"
             >
               Annuler
             </Button>
-            <Button className="bg-[#ea8b49] hover:bg-[#ea8b49]/90 text-white">
+            <Button className="bg-primary-700 hover:bg-primary-700/90 text-white">
               Valider
             </Button>
           </DialogFooter>
@@ -286,11 +288,11 @@ export default function AstreintesPage() {
             <Button
               variant="ghost"
               onClick={() => setIsDayModalOpen(false)}
-              className="text-[#ea8b49]"
+              className="text-primary-700"
             >
               Annuler
             </Button>
-            <Button className="bg-[#ea8b49] hover:bg-[#ea8b49]/90 text-white">
+            <Button className="bg-primary-700 hover:bg-primary-700/90 text-white">
               Valider
             </Button>
           </DialogFooter>

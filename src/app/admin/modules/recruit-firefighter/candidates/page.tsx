@@ -124,8 +124,8 @@ export default function CandidatesList() {
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-neutral-900 mb-1">Candidatures</h1>
         <p className="text-neutral-600 text-sm mb-4">{candidates.length} candidatures</p>
-        
-        <div className="flex items-center justify-between">
+
+        <div className="flex items-center justify-between gap-3 flex-col sm:flex-row">
           <button className="inline-flex items-center gap-2 px-4 py-2 bg-secondary-900 text-white rounded-md hover:bg-secondary-800 transition-colors">
             <Filter className="size-4" />
             Filtrer
@@ -159,7 +159,8 @@ export default function CandidatesList() {
       {viewMode === "list" ? (
         /* Table View */
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          <table className="w-full">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[800px]">
             <thead className="bg-neutral-50 border-b">
               <tr>
                 <th className="w-12 p-4">
@@ -212,6 +213,7 @@ export default function CandidatesList() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       ) : (
         /* Kanban View */
@@ -220,7 +222,7 @@ export default function CandidatesList() {
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {STATUSES.map((status) => (
               <KanbanColumn
                 key={status}

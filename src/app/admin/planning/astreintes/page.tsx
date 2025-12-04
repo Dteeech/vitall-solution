@@ -32,7 +32,7 @@ export default function AstreintesPage() {
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
 
   // Mock data for calendar
-  const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+  const daysOfWeek = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"]
 
   const calendarDays: CalendarDay[] = [
     { date: 1, isCurrentMonth: false },
@@ -132,7 +132,7 @@ export default function AstreintesPage() {
                 ${index === calendarDays.length - 1 ? "rounded-br-2xl" : ""}
               `}
             >
-              <span className={`text-[21px] font-medium ${day.isCurrentMonth ? "text-[#131315]" : "text-[#131315]"}`}>
+              <span className={`text-[21px] font-medium text-[#131315] tracking-[0.21px] ${!day.isCurrentMonth ? "opacity-40" : ""}`}>
                 {day.date}
               </span>
 
@@ -234,9 +234,9 @@ export default function AstreintesPage() {
 
           <DialogFooter className="flex gap-6 justify-end pt-4 border-t">
             <Button
-              variant="ghost"
+              variant="outline"
               onClick={() => setIsGlobalModalOpen(false)}
-              className="text-primary-700"
+              className="text-primary-700 border-primary-700 hover:bg-primary-700/10"
             >
               Annuler
             </Button>
@@ -286,9 +286,9 @@ export default function AstreintesPage() {
 
           <DialogFooter className="flex gap-6 justify-end pt-4 border-t">
             <Button
-              variant="ghost"
+              variant="outline"
               onClick={() => setIsDayModalOpen(false)}
-              className="text-primary-700"
+              className="text-primary-700 border-primary-700 hover:bg-primary-700/10"
             >
               Annuler
             </Button>

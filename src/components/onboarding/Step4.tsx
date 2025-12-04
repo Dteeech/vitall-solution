@@ -3,9 +3,16 @@ import { CardContent, CardHeader, CardTitle, CardDescription } from "@/component
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+type WizardData = {
+  field1?: string;
+  field2?: string;
+  field3?: string;
+  field4?: string;
+};
+
 interface StepProps {
-  data: any;
-  updateData: (key: string, value: any) => void;
+  data: WizardData;
+  updateData: (key: keyof WizardData, value: string) => void;
 }
 
 const Step4: React.FC<StepProps> = ({ data, updateData }) => {

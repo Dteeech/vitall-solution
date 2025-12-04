@@ -1,16 +1,23 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardFooter } from "@/components/ui/Card";
+import { Card, CardFooter } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
 import Step1 from './Step1';
 import Step2 from './Step2';
 import Step3 from './Step3';
 import Step4 from './Step4';
 
+type WizardData = {
+  field1?: string;
+  field2?: string;
+  field3?: string;
+  field4?: string;
+};
+
 const OnboardingWizard = () => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState<WizardData>({});
 
   const totalSteps = 4;
 
@@ -29,7 +36,7 @@ const OnboardingWizard = () => {
     }
   };
 
-  const updateData = (key: string, value: any) => {
+  const updateData = (key: keyof WizardData, value: string) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 

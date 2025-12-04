@@ -13,6 +13,7 @@ import {
 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 import {
   Sidebar,
@@ -63,7 +64,7 @@ const MAIN_MENU_ITEMS: MenuItem[] = [
     title: "Planning",
     iconSrc: "/assets/icons/Planning.svg",
     subItems: [
-     {title: "sous menu", href:"/"},  
+     {title: "astreintes", href:"/admin/planning/astreintes"},  
      {title: "sous menu", href:"/"},  
      {title: "sous menu", href:"/"},  
      {title: "sous menu", href:"/"},  
@@ -103,8 +104,18 @@ const FOOTER_MENU_ITEMS: MenuItem[] = [
 ]
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const [openMenus, setOpenMenus] = React.useState<Record<string, boolean>>({
-    Recrutement: true,
+  const pathname = usePathname()
+  const [openMenus, setOpenMenus] = React.useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {}
+    MAIN_MENU_ITEMS.forEach((item) => {
+      if (item.subItems && item.subItems.length > 0) {
+        const hasActive = item.subItems.some(
+          (sub) => pathname === sub.href || pathname.startsWith(`${sub.href}/`)
+        )
+        initial[item.title] = hasActive
+      }
+    })
+    return initial
   })
 
   const toggleMenu = (title: string) => {
@@ -193,19 +204,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   </>
                 )}
               </SidebarMenuButton>
-              {item.subItems && item.subItems.length > 0 && openMenus[item.title] && (
+                  {item.subItems && item.subItems.length > 0 && openMenus[item.title] && (
                 <SidebarMenuSub className="border-l border-white/20 ml-3">
-                  {item.subItems.map((subItem) => (
-                    <SidebarMenuSubItem key={subItem.title}>
-                      <SidebarMenuSubButton
-                        asChild
-                        className={`text-white hover:bg-secondary-700 font-medium ${subItem.isActive ? "bg-secondary-700" : ""
-                          }`}
-                      >
-                        <Link href={subItem.href}>{subItem.title}</Link>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  ))}
+                  {item.subItems.map((subItem) => {
+                    const active = pathname === subItem.href || pathname.startsWith(`${subItem.href}/`)
+                    return (
+                      <SidebarMenuSubItem key={subItem.title}>
+                        <SidebarMenuSubButton
+                          asChild
+                          className={`text-white hover:bg-secondary-700 font-medium ${active ? "bg-secondary-700" : ""}`}
+                        >
+                          <Link href={subItem.href}>{subItem.title}</Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    )
+                  })}
                 </SidebarMenuSub>
               )}
             </SidebarMenuItem>

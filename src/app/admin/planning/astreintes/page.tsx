@@ -17,7 +17,7 @@ type AstreinteAssignment = {
   id: string
   name: string
   initials: string
-  color: string
+  colorClass: string
 }
 
 type CalendarDay = {
@@ -40,13 +40,13 @@ export default function AstreintesPage() {
     { date: 3, isCurrentMonth: true },
     { date: 4, isCurrentMonth: true },
     { date: 5, isCurrentMonth: true },
-    { date: 6, isCurrentMonth: true, assignment: { id: "1", name: "Nicolas Petit", initials: "NP", color: "#203b55" } },
-    { date: 7, isCurrentMonth: true, assignment: { id: "1", name: "Nicolas Petit", initials: "NP", color: "#203b55" } },
-    { date: 8, isCurrentMonth: true, assignment: { id: "1", name: "Nicolas Petit", initials: "NP", color: "#203b55" } },
-    { date: 9, isCurrentMonth: true, assignment: { id: "1", name: "Nicolas Petit", initials: "NP", color: "#203b55" } },
-    { date: 10, isCurrentMonth: true, assignment: { id: "1", name: "Nicolas Petit", initials: "NP", color: "#203b55" } },
-    { date: 11, isCurrentMonth: true, assignment: { id: "1", name: "Nicolas Petit", initials: "NP", color: "#203b55" } },
-    { date: 12, isCurrentMonth: true, assignment: { id: "1", name: "Nicolas Petit", initials: "NP", color: "#203b55" } },
+    { date: 6, isCurrentMonth: true, assignment: { id: "1", name: "Nicolas Petit", initials: "NP", colorClass: "bg-secondary-900" } },
+    { date: 7, isCurrentMonth: true, assignment: { id: "1", name: "Nicolas Petit", initials: "NP", colorClass: "bg-secondary-900" } },
+    { date: 8, isCurrentMonth: true, assignment: { id: "1", name: "Nicolas Petit", initials: "NP", colorClass: "bg-secondary-900" } },
+    { date: 9, isCurrentMonth: true, assignment: { id: "1", name: "Nicolas Petit", initials: "NP", colorClass: "bg-secondary-900" } },
+    { date: 10, isCurrentMonth: true, assignment: { id: "1", name: "Nicolas Petit", initials: "NP", colorClass: "bg-secondary-900" } },
+    { date: 11, isCurrentMonth: true, assignment: { id: "1", name: "Nicolas Petit", initials: "NP", colorClass: "bg-secondary-900" } },
+    { date: 12, isCurrentMonth: true, assignment: { id: "1", name: "Nicolas Petit", initials: "NP", colorClass: "bg-secondary-900" } },
     { date: 13, isCurrentMonth: true },
     { date: 14, isCurrentMonth: true },
     { date: 15, isCurrentMonth: true },
@@ -56,7 +56,7 @@ export default function AstreintesPage() {
     { date: 19, isCurrentMonth: true },
     { date: 20, isCurrentMonth: true },
     { date: 21, isCurrentMonth: true },
-    { date: 22, isCurrentMonth: true, assignment: { id: "2", name: "Léo Plongon", initials: "LP", color: "#9d4c1b" } },
+    { date: 22, isCurrentMonth: true, assignment: { id: "2", name: "Léo Plongon", initials: "LP", colorClass: "bg-primary-700" } },
     { date: 23, isCurrentMonth: true },
     { date: 24, isCurrentMonth: true },
     { date: 25, isCurrentMonth: true },
@@ -83,7 +83,7 @@ export default function AstreintesPage() {
     <div className="flex flex-col gap-6 p-6">
       {/* Header */}
       <div className="flex flex-col gap-1">
-        <h1 className="text-[32px] font-semibold text-[#131315]">
+        <h1 className="text-[32px] font-semibold text-neutral-900">
           Gestion des astreintes
         </h1>
       </div>
@@ -101,19 +101,19 @@ export default function AstreintesPage() {
 
       {/* Calendar */}
       <div className="overflow-x-auto">
-      <div className="min-w-[720px] rounded-2xl shadow-sm border border-[#f1f1f1] overflow-hidden">
+      <div className="min-w-[720px] rounded-2xl shadow-sm border border-neutral-200 overflow-hidden">
         {/* Calendar Header */}
         <div className="grid grid-cols-7 bg-white">
           {daysOfWeek.map((day, index) => (
             <div
               key={day}
               className={`
-                p-2 border border-[#f1f1f1] h-12 flex items-start
+                p-2 border border-neutral-200 h-12 flex items-start
                 ${index === 0 ? "rounded-tl-2xl" : ""}
                 ${index === 6 ? "rounded-tr-2xl" : ""}
               `}
             >
-              <span className="text-[#969390] text-base">{day}</span>
+              <span className="text-neutral-500 text-base">{day}</span>
             </div>
           ))}
         </div>
@@ -125,25 +125,24 @@ export default function AstreintesPage() {
               key={index}
               onClick={() => handleDayClick(day)}
               className={`
-                min-h-[120px] md:min-h-[153px] p-3 md:p-4 border border-[#f1f1f1] flex flex-col justify-between
-                ${day.isCurrentMonth ? "bg-white cursor-pointer hover:bg-gray-50" : "bg-[#f4f4f4]"}
+                min-h-[120px] md:min-h-[153px] p-3 md:p-4 border border-neutral-200 flex flex-col justify-between
+                ${day.isCurrentMonth ? "bg-white cursor-pointer hover:bg-neutral-50" : "bg-neutral-100"}
                 ${!day.isCurrentMonth ? "opacity-40" : ""}
                 ${index === calendarDays.length - 7 ? "rounded-bl-2xl" : ""}
                 ${index === calendarDays.length - 1 ? "rounded-br-2xl" : ""}
               `}
             >
-              <span className={`text-[21px] font-medium text-[#131315] tracking-[0.21px] ${!day.isCurrentMonth ? "opacity-40" : ""}`}>
+              <span className={`text-[21px] font-medium text-neutral-900 tracking-[0.21px] ${!day.isCurrentMonth ? "opacity-40" : ""}`}>
                 {day.date}
               </span>
 
               {day.assignment && (
                 <div className="flex items-start mt-2">
                   <div
-                    className="flex gap-1 items-center px-1 py-1 rounded"
-                    style={{ backgroundColor: day.assignment.color }}
+                    className={`flex gap-1 items-center px-1 py-1 rounded ${day.assignment.colorClass}`}
                   >
                     <div className="bg-white rounded-full w-[18px] h-[18px] flex items-center justify-center">
-                      <span className="text-[8px] font-bold text-[#132e49]">
+                      <span className="text-[8px] font-bold text-secondary-900">
                         {day.assignment.initials}
                       </span>
                     </div>
@@ -171,19 +170,19 @@ export default function AstreintesPage() {
           <div className="flex flex-col gap-4">
             {/* Weeks Section */}
             <div className="flex flex-col gap-2">
-              <Label className="text-xs text-[#131315]">
-                Semaine(s) ciblée(s) <span className="text-[#d63737]">*</span>
+              <Label className="text-xs text-neutral-900">
+                Semaine(s) ciblée(s) <span className="text-error">*</span>
               </Label>
 
               <div className="flex flex-col gap-2">
                 {selectedWeeks.map((week, index) => (
                   <div key={index} className="flex gap-2 items-center">
-                    <div className="flex-1 flex items-center gap-2 px-4 py-2 border border-[#f1f1f1] rounded-lg bg-white">
-                      <CalendarIcon className="h-6 w-6 text-[#0c0c0c]" />
-                      <span className="text-sm text-[#555455]">{week}</span>
+                    <div className="flex-1 flex items-center gap-2 px-4 py-2 border border-neutral-200 rounded-lg bg-white">
+                      <CalendarIcon className="h-6 w-6 text-neutral-900" />
+                      <span className="text-sm text-neutral-600">{week}</span>
                     </div>
                     <Button variant="ghost" size="icon" className="h-10 w-10">
-                      <Plus className="h-6 w-6 text-[#132e49]" />
+                      <Plus className="h-6 w-6 text-secondary-900" />
                     </Button>
                   </div>
                 ))}
@@ -200,8 +199,8 @@ export default function AstreintesPage() {
 
             {/* Days Section */}
             <div className="flex flex-col gap-2">
-              <Label className="text-xs text-[#131315]">
-                Jours concernés <span className="text-[#d63737]">*</span>
+              <Label className="text-xs text-neutral-900">
+                Jours concernés <span className="text-error">*</span>
               </Label>
 
               <div className="flex flex-wrap gap-1">
@@ -210,7 +209,7 @@ export default function AstreintesPage() {
                     key={index}
                     className={`
                       px-2 py-1 rounded text-xs font-medium text-white
-                      ${selectedDays.includes(day) ? "bg-[#ea8b49]" : "bg-gray-300"}
+                      ${selectedDays.includes(day) ? "bg-primary-600" : "bg-neutral-300 text-neutral-800"}
                     `}
                   >
                     {day}
@@ -221,13 +220,13 @@ export default function AstreintesPage() {
 
             {/* Collaborator Section */}
             <div className="flex flex-col gap-2">
-              <Label className="text-xs text-[#131315]">
-                Collaborateur <span className="text-[#d63737]">*</span>
+              <Label className="text-xs text-neutral-900">
+                Collaborateur <span className="text-error">*</span>
               </Label>
 
               <Input
                 placeholder="Nicolas Petit"
-                className="border-[#969390]"
+                className="border-neutral-300"
               />
             </div>
           </div>
@@ -259,27 +258,27 @@ export default function AstreintesPage() {
           <div className="flex flex-col gap-4">
             {/* Target Day */}
             <div className="flex flex-col gap-2">
-              <Label className="text-xs text-[#131315]">
-                Journée cible <span className="text-[#d63737]">*</span>
+              <Label className="text-xs text-neutral-900">
+                Journée cible <span className="text-error">*</span>
               </Label>
 
-              <div className="flex items-center gap-2 px-4 py-2 bg-[#f1f1f1] rounded-lg">
-                <span className="text-sm text-[#969390]">
+              <div className="flex items-center gap-2 px-4 py-2 bg-neutral-100 rounded-lg">
+                <span className="text-sm text-neutral-500">
                   {selectedDay}/01/2025
                 </span>
-                <CalendarIcon className="h-6 w-6 ml-auto text-[#010102]" />
+                <CalendarIcon className="h-6 w-6 ml-auto text-neutral-900" />
               </div>
             </div>
 
             {/* Collaborator */}
             <div className="flex flex-col gap-2">
-              <Label className="text-base font-semibold text-[#131315]">
-                Collaborateur <span className="text-[#d63737]">*</span>
+              <Label className="text-base font-semibold text-neutral-900">
+                Collaborateur <span className="text-error">*</span>
               </Label>
 
               <Input
                 placeholder="Placeholder"
-                className="border-[#f1f1f1]"
+                className="border-neutral-200"
               />
             </div>
           </div>

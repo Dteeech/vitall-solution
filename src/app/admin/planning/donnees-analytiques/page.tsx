@@ -1,7 +1,21 @@
 "use client"
 
+import { Bar, BarChart, Cell, Pie, PieChart, XAxis, YAxis } from "recharts"
 import { Calendar, Users, Clock } from "lucide-react"
+
 import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/Card"
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart"
 
 // Type pour les données de KPI
 type KPICardData = {
@@ -23,7 +37,6 @@ type ActivityData = {
 type CollaboratorHours = {
   name: string
   hours: number
-  maxHours: number // Pour calculer le pourcentage de la barre
 }
 
 // Composant pour une carte KPI
@@ -31,10 +44,10 @@ function KPICard({ value, label, bgColor, iconBgColor, Icon }: KPICardData) {
   return (
     <div className={`${bgColor} flex items-start justify-between p-6 rounded-2xl flex-1`}>
       <div className="flex flex-col gap-2">
-        <p className="text-[64px] font-semibold text-[#131315] leading-none">
+        <p className="text-[64px] font-semibold text-neutral-900 leading-none">
           {value}
         </p>
-        <p className="text-sm font-semibold text-[#131315]">
+        <p className="text-sm font-semibold text-neutral-900">
           {label}
         </p>
       </div>
@@ -45,94 +58,21 @@ function KPICard({ value, label, bgColor, iconBgColor, Icon }: KPICardData) {
   )
 }
 
-// Composant pour la légende du graphique
-function LegendItem({ color, label }: { color: string; label: string }) {
+function ActivityLegend({ items }: { items: ActivityData[] }) {
   return (
-    <div className="flex items-center gap-1 w-[117px]">
-      <div className={`w-4 h-4 rounded ${color}`} />
-      <p className="text-xs text-[#465b5e] tracking-[0.12px]">
-        {label}
-      </p>
-    </div>
-  )
-}
-
-// Composant pour le graphique circulaire (simplifié)
-function DonutChart({ data, total }: { data: ActivityData[]; total: string }) {
-  // Pour un vrai graphique, vous pouvez utiliser une bibliothèque comme recharts ou chart.js
-  // Ici, nous utilisons un SVG simple pour la démonstration
-  let currentAngle = 0
-
-  const createArc = (percentage: number) => {
-    const startAngle = currentAngle
-    const endAngle = currentAngle + (percentage / 100) * 360
-    currentAngle = endAngle
-
-    const startRad = (startAngle - 90) * Math.PI / 180
-    const endRad = (endAngle - 90) * Math.PI / 180
-
-    const radius = 70
-    const innerRadius = 45
-    const cx = 79
-    const cy = 78
-
-    const x1 = cx + radius * Math.cos(startRad)
-    const y1 = cy + radius * Math.sin(startRad)
-    const x2 = cx + radius * Math.cos(endRad)
-    const y2 = cy + radius * Math.sin(endRad)
-    const x3 = cx + innerRadius * Math.cos(endRad)
-    const y3 = cy + innerRadius * Math.sin(endRad)
-    const x4 = cx + innerRadius * Math.cos(startRad)
-    const y4 = cy + innerRadius * Math.sin(startRad)
-
-    const largeArc = percentage > 50 ? 1 : 0
-
-    return `M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} L ${x3} ${y3} A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${x4} ${y4} Z`
-  }
-
-  return (
-    <div className="flex flex-col items-center gap-6 w-full">
-      <svg width="158" height="156" viewBox="0 0 158 156" className="shrink-0">
-        {data.map((item, index) => (
-          <path
-            key={index}
-            d={createArc(item.percentage)}
-            fill={item.color}
+    <div className="mt-4 grid w-full max-w-[280px] grid-cols-2 gap-x-3 gap-y-2 mx-auto">
+      {items.map((item) => (
+        <div key={item.label} className="flex items-center gap-2">
+          <span
+            className="h-3 w-3 rounded-full"
+            style={{ backgroundColor: item.color }}
+            aria-hidden
           />
-        ))}
-      </svg>
-
-      <div className="flex flex-col gap-4 w-full">
-        <div className="flex flex-wrap gap-4 justify-between py-2">
-          {data.map((item, index) => (
-            <LegendItem key={index} color={item.color} label={item.label} />
-          ))}
+          <span className="text-sm font-medium text-neutral-900 leading-none">
+            {item.label}
+          </span>
         </div>
-
-        <div className="bg-[#f1f1f1] px-4 py-1 rounded-lg text-center text-sm">
-          <span className="font-normal">Total : </span>
-          <span className="font-semibold">{total}</span>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// Composant pour une barre horizontale
-function HorizontalBar({ name, hours, maxHours }: CollaboratorHours) {
-  const percentage = (hours / maxHours) * 100
-
-  return (
-    <div className="flex items-center gap-2 w-full">
-      <span className="text-xs text-[#131315] w-20 text-right">
-        {name}
-      </span>
-      <div className="flex-1 h-4 bg-[#f1f1f1] rounded-full relative">
-        <div
-          className="h-full bg-[#555455] rounded-full"
-          style={{ width: `${percentage}%` }}
-        />
-      </div>
+      ))}
     </div>
   )
 }
@@ -143,49 +83,61 @@ export default function DonneesAnalytiquesPage() {
     {
       value: "24",
       label: "Interventions planifiées",
-      bgColor: "bg-[#fff0e4]",
-      iconBgColor: "bg-[#ea8b49]",
+      bgColor: "bg-primary-50",
+      iconBgColor: "bg-primary-700",
       Icon: Calendar,
     },
     {
       value: "32",
       label: "Collaborateurs actifs",
-      bgColor: "bg-[#eaf1f6]",
-      iconBgColor: "bg-[#132e49]",
+      bgColor: "bg-secondary-50",
+      iconBgColor: "bg-secondary-900",
       Icon: Users,
     },
     {
       value: "1,842h",
       label: "Heures planifiées",
-      bgColor: "bg-[#f4f4f4]",
-      iconBgColor: "bg-[#555455]",
+      bgColor: "bg-neutral-100",
+      iconBgColor: "bg-secondary-700",
       Icon: Clock,
     },
   ]
 
   const activityData: ActivityData[] = [
-    { label: "Astreintes", color: "bg-[#ea8b49]", percentage: 30 },
-    { label: "Interventions", color: "bg-[#7195aa]", percentage: 25 },
-    { label: "Formations", color: "bg-[#b6b2ae]", percentage: 20 },
-    { label: "Ges.admin.", color: "bg-[#f1f1f1]", percentage: 15 },
-    { label: "Entretien", color: "bg-[#d3d3d3]", percentage: 10 },
+    { label: "Astreintes", color: "var(--color-primary-700)", percentage: 30 },
+    { label: "Interventions", color: "var(--color-secondary-700)", percentage: 25 },
+    { label: "Formations", color: "var(--color-primary-300)", percentage: 20 },
+    { label: "Ges.admin.", color: "var(--color-secondary-300)", percentage: 15 },
+    { label: "Entretien", color: "var(--color-secondary-500)", percentage: 10 },
   ]
 
   const collaboratorData: CollaboratorHours[] = [
-    { name: "Marin D.", hours: 125, maxHours: 154 },
-    { name: "Sophie L.", hours: 125, maxHours: 154 },
-    { name: "Jean M.", hours: 125, maxHours: 154 },
-    { name: "Marie P.", hours: 25, maxHours: 154 },
-    { name: "Claire B.", hours: 75, maxHours: 154 },
-    { name: "Luc T.", hours: 100, maxHours: 154 },
-    { name: "Emma D.", hours: 125, maxHours: 154 },
+    { name: "Marin D.", hours: 125 },
+    { name: "Sophie L.", hours: 125 },
+    { name: "Jean M.", hours: 125 },
+    { name: "Marie P.", hours: 25 },
+    { name: "Claire B.", hours: 75 },
+    { name: "Luc T.", hours: 100 },
+    { name: "Emma D.", hours: 125 },
   ]
+
+  const chartConfig = {
+    heures: {
+      label: "Heures",
+      color: "var(--color-secondary-800)",
+    },
+    astreintes: { label: "Astreintes", color: "var(--color-primary-700)" },
+    interventions: { label: "Interventions", color: "var(--color-secondary-700)" },
+    formations: { label: "Formations", color: "var(--color-primary-300)" },
+    gesadmin: { label: "Ges.admin.", color: "var(--color-secondary-300)" },
+    entretien: { label: "Entretien", color: "var(--color-secondary-500)" },
+  }
 
   return (
     <div className="flex flex-col gap-6 p-6">
       {/* Header */}
       <div className="flex flex-col gap-1">
-        <h1 className="text-[32px] font-semibold text-[#131315]">
+        <h1 className="text-[32px] font-semibold text-neutral-900">
           Données analytiques
         </h1>
       </div>
@@ -200,56 +152,72 @@ export default function DonneesAnalytiquesPage() {
       {/* Graphiques */}
       <div className="flex gap-6">
         {/* Graphique circulaire - Répartition des activités */}
-        <div className="bg-white border border-[#f1f1f1] rounded-xl p-4 w-[300px] flex flex-col gap-6">
-          <div className="flex flex-col gap-3">
-            <div className="flex items-start justify-between">
-              <h2 className="text-lg font-bold text-[#1c2e30]">
-                Répartition des activités
-              </h2>
-            </div>
-            <div className="h-px bg-[#f1f1f1]" />
-          </div>
-
-          <DonutChart data={activityData} total="567 activités" />
-        </div>
+        <Card className="flex flex-col w-[300px]">
+          <CardHeader>
+            <CardTitle>Répartition des activités</CardTitle>
+            <CardDescription>Total : 567 activités</CardDescription>
+          </CardHeader>
+          <CardContent className="flex-1 pb-0 flex flex-col items-center">
+            <ChartContainer
+              config={chartConfig}
+              className="mx-auto aspect-square h-full w-full"
+            >
+              <PieChart>
+                <ChartTooltip
+                  content={<ChartTooltipContent nameKey="percentage" hideLabel />}
+                />
+                <Pie
+                  data={activityData}
+                  dataKey="percentage"
+                  nameKey="label"
+                  innerRadius={30}
+                  strokeWidth={5}
+                >
+                  {activityData.map((entry) => (
+                    <Cell key={entry.label} fill={entry.color} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ChartContainer>
+            <ActivityLegend items={activityData} />
+          </CardContent>
+        </Card>
 
         {/* Graphique à barres - Heures par collaborateur */}
-        <div className="bg-white border border-[#f1f1f1] rounded-xl p-4 flex-1 flex flex-col gap-6">
-          <div className="flex flex-col gap-3">
-            <div className="flex items-start justify-between">
-              <h2 className="text-lg font-bold text-[#1c2e30]">
-                Heures par collaborateur (ce mois)
-              </h2>
-            </div>
-            <div className="h-px bg-[#f1f1f1]" />
-          </div>
-
-          <div className="flex flex-col gap-1">
-            {collaboratorData.map((collab, index) => (
-              <HorizontalBar key={index} {...collab} />
-            ))}
-          </div>
-
-          {/* Échelle horizontale */}
-          <div className="flex justify-between text-xs text-[#131315] pl-[88px]">
-            <span>0</span>
-            <span>14</span>
-            <span>28</span>
-            <span>42</span>
-            <span>56</span>
-            <span>70</span>
-            <span>84</span>
-            <span>98</span>
-            <span>112</span>
-            <span>126</span>
-            <span>140</span>
-            <span>154</span>
-          </div>
-        </div>
+        <Card className="flex-1">
+          <CardHeader>
+            <CardTitle>Heures par collaborateur (ce mois)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={chartConfig} className="h-[250px] w-full">
+              <BarChart
+                accessibilityLayer
+                data={collaboratorData}
+                layout="vertical"
+                margin={{ left: 10, right: 10 }}
+              >
+                <YAxis
+                  dataKey="name"
+                  type="category"
+                  tickLine={false}
+                  tickMargin={10}
+                  axisLine={false}
+                  tickFormatter={(value) => value.slice(0, 10)}
+                />
+                <XAxis dataKey="hours" type="number" hide />
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent hideLabel />}
+                />
+                <Bar dataKey="hours" layout="vertical" radius={5} fill={chartConfig.heures.color} />
+              </BarChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Section Export */}
-      <div className="bg-[#203b55] border border-[#f1f1f1] rounded-xl p-4 flex items-center justify-between">
+      <div className="bg-secondary-900 border border-neutral-200 rounded-xl p-4 flex items-center justify-between">
         <h2 className="text-lg font-bold text-white">
           Exporter des données
         </h2>

@@ -1,0 +1,30 @@
+'use client'
+
+import Image from 'next/image'
+import LoginForm from '@/components/ui/LoginForm'
+
+export default function LoginPageContent() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+      <div className="w-full max-w-6xl bg-white shadow-sm rounded-lg overflow-hidden grid grid-cols-1 md:grid-cols-2">
+        {/* Left artwork */}
+        <div className="hidden md:flex bg-primary-softer p-8 items-center justify-start w-full ">
+          <div className="relative min-w-[520px] h-[650px] max-w-xs overflow-hidden rounded-2xl">
+            <Image src="/assets/images/onboarding.png" alt="Illustration" fill className="object-cover w-full h-full" />
+          </div>
+        </div>
+
+        {/* Right form area */}
+        <div className="p-10 flex flex-col justify-around">
+          <div className="flex justify-end mb-6">
+            <div className="text-right">
+              <Image src="/assets/images/logo-N&B.png" alt="Vitall" width={64} height={64} />
+            </div>
+          </div>
+
+          <LoginForm />
+        </div>
+      </div>
+    </div>
+  )
+}

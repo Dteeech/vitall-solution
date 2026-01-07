@@ -14,6 +14,7 @@ import {
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import logoBlanc from "../../public/assets/images/Logo-Blanc-avec-texte.png"
 
 import {
   Sidebar,
@@ -128,9 +129,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     >
       <SidebarHeader className="pt-10 pb-6">
         <div className="flex justify-center px-4">
-          <Link href="/dashboard">
+          <Link href="/admin">
             <Image
-              src="/Logo-Blanc-avec-texte.png"
+              src={logoBlanc}
               alt="Vitall"
               width={108}
               height={32}
@@ -138,7 +139,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             />
           </Link>
           <Image
-            src="/icons/small-vitall-icon-sidebar-closed.svg"
+            src={logoBlanc}
             alt="Vitall"
             width={32}
             height={32}

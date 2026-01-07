@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum UserRole {
+  ADMIN
+  USER
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+  CANCELLED
+}
+
+// Models
+model User {
+  id             String    @id @default(uuid())
+  email          String    @unique
+  password       String // Hashed password
+  firstName      String
+  lastName       String
+  role           UserRole  @default(USER)
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Organization {
+  id           String    @id @default(uuid())
+  name         String
+  address      String?
+  users        User[]
+  subscription Subscription?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Module {
+  id                  String               @id @default(uuid())
+  name                String               @unique
+  category            String
+  price               Float
+  description         String?
+  isBasePackModule    Boolean              @default(false)
+  subscriptionModules SubscriptionModule[]
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+}
+
+model Subscription {
+  id                 String               @id @default(uuid())
+  organization       Organization         @relation(fields: [organizationId], references: [id])
+  organizationId     String               @unique
+  status             SubscriptionStatus   @default(PENDING)
+  startDate          DateTime             @default(now())
+  endDate            DateTime?
+  monthlyPrice       Float                @default(0)
+  subscriptionModules SubscriptionModule[]
+  stripeCustomerId   String?
+  stripeSubscriptionId String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+}
+
+model SubscriptionModule {
+  id             String     @id @default(uuid())
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+  subscriptionId String
+  module         Module     @relation(fields: [moduleId], references: [id])
+  moduleId       String
+  assignedAt     DateTime   @default(now())
+
+  @@unique([subscriptionId, moduleId]) // Ensures a module can only be assigned once per subscription
+}

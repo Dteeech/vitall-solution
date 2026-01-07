@@ -4,7 +4,7 @@ set -e
 echo "🔄 Running Prisma migrations..."
 
 # Push database schema (creates tables if they don't exist)
-npx prisma db push --accept-data-loss
+npx prisma@6.19.1 db push --accept-data-loss
 
 echo "✅ Migrations completed successfully"
 

@@ -39,3 +39,17 @@ jobs:
           build-args: |
             STRIPE_SECRET_KEY=dummy
             NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=dummy
+
+      - name: Deployment reminder
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "✅ Image pushed to GHCR"
+          echo "⚠️  TODO : configurer les secrets en production :"
+          echo "   - SEED_ADMIN_PASSWORD"
+          echo "   - SEED_USER_PASSWORD"
+          echo "   - DATABASE_URL"
+          echo "   - JWT_SECRET"
+          echo "   - STRIPE_SECRET_KEY"
+          echo "   - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY"
+          echo "   - STRIPE_WEBHOOK_SECRET"
+          echo "📖 Voir PRODUCTION-SECRETS.md pour les instructions détaillées"

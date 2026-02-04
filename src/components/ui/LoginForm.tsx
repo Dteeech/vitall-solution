@@ -1,18 +1,44 @@
 'use client'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { toast } from 'react-toastify'
 import { TextInput } from './TextInput'
 import { PrimaryButton } from './PrimaryButton'
 
 export default function LoginForm() {
+  const router = useRouter()
   const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
   const [remember, setRemember] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    // placeholder - replace with actual auth call
-    console.log('login', { identifier, password, remember })
-    alert('Tentative de connexion (mock)')
+    setLoading(true)
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: identifier, password }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        toast.error(data.message || 'Identifiants incorrects')
+        setLoading(false)
+        return
+      }
+
+      toast.success('Connexion réussie !')
+      // Redirection selon le rôle
+      const redirectUrl = data.role === 'ADMIN' ? '/admin' : '/dashboard'
+      setTimeout(() => router.push(redirectUrl), 500)
+    } catch (err) {
+      toast.error('Erreur de connexion. Veuillez réessayer.')
+      setLoading(false)
+    }
   }
 
   return (
@@ -22,20 +48,43 @@ export default function LoginForm() {
 
       <div className="mb-4">
         <label className="block text-sm font-medium mb-1 text-neutral-dark">Identifiant <span className="text-danger">*</span></label>
-        <TextInput placeholder="Placeholder" value={identifier} onChange={(e) => setIdentifier(e.target.value)} />
+        <TextInput 
+          placeholder="email@exemple.fr" 
+          value={identifier} 
+          onChange={(e) => setIdentifier(e.target.value)}
+          disabled={loading}
+        />
       </div>
 
       <div className="mb-4">
         <label className="block text-sm font-medium mb-1 text-neutral-dark">Mot de passe <span className="text-danger">*</span></label>
-        <TextInput placeholder="Placeholder" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        <TextInput 
+          placeholder="Votre mot de passe" 
+          type="password" 
+          value={password} 
+          onChange={(e) => setPassword(e.target.value)}
+          disabled={loading}
+        />
       </div>
 
       <div className="flex items-center gap-2 mb-6">
-        <input id="remember" type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="h-4 w-4" />
+        <input 
+          id="remember" 
+          type="checkbox" 
+          checked={remember} 
+          onChange={(e) => setRemember(e.target.checked)} 
+          className="h-4 w-4"
+          disabled={loading}
+        />
         <label htmlFor="remember" className="text-sm text-neutral-dark">Se souvenir de mon mot de passe</label>
       </div>
 
-      <PrimaryButton label="Connexion" type="submit" className="w-full" />
+      <PrimaryButton 
+        label={loading ? "Connexion..." : "Connexion"} 
+        type="submit" 
+        className="w-full"
+        disabled={loading}
+      />
     </form>
   )
 }

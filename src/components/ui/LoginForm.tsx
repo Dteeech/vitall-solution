@@ -33,7 +33,7 @@ export default function LoginForm() {
 
       toast.success('Connexion réussie !')
       // Redirection selon le rôle
-      const redirectUrl = data.role === 'ADMIN' ? '/admin' : '/dashboard'
+      const redirectUrl = data.user.role === 'ADMIN' ? '/admin' : '/dashboard'
       setTimeout(() => router.push(redirectUrl), 500)
     } catch (err) {
       toast.error('Erreur de connexion. Veuillez réessayer.')

@@ -40,9 +40,11 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Sécurité : utilisateur non-root
+# Sécurité : utilisateur non-root avec un home directory valide
 RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
+    adduser --system --uid 1001 --home /home/nextjs nextjs && \
+    mkdir -p /home/nextjs && \
+    chown -R nextjs:nodejs /home/nextjs
 
 # On ne copie que le strict nécessaire grâce au mode standalone
 COPY --from=builder /app/public ./public

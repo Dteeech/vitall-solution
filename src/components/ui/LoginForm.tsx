@@ -33,7 +33,7 @@ export default function LoginForm() {
 
       toast.success('Connexion réussie !')
       // Redirection selon le rôle
-      const redirectUrl = data.role === 'ADMIN' ? '/admin' : '/dashboard'
+      const redirectUrl = data.user.role === 'ADMIN' ? '/admin' : '/dashboard'
       setTimeout(() => router.push(redirectUrl), 500)
     } catch (err) {
       toast.error('Erreur de connexion. Veuillez réessayer.')
@@ -48,9 +48,9 @@ export default function LoginForm() {
 
       <div className="mb-4">
         <label className="block text-sm font-medium mb-1 text-neutral-dark">Identifiant <span className="text-danger">*</span></label>
-        <TextInput 
-          placeholder="email@exemple.fr" 
-          value={identifier} 
+        <TextInput
+          placeholder="email@exemple.fr"
+          value={identifier}
           onChange={(e) => setIdentifier(e.target.value)}
           disabled={loading}
         />
@@ -58,30 +58,30 @@ export default function LoginForm() {
 
       <div className="mb-4">
         <label className="block text-sm font-medium mb-1 text-neutral-dark">Mot de passe <span className="text-danger">*</span></label>
-        <TextInput 
-          placeholder="Votre mot de passe" 
-          type="password" 
-          value={password} 
+        <TextInput
+          placeholder="Votre mot de passe"
+          type="password"
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
           disabled={loading}
         />
       </div>
 
       <div className="flex items-center gap-2 mb-6">
-        <input 
-          id="remember" 
-          type="checkbox" 
-          checked={remember} 
-          onChange={(e) => setRemember(e.target.checked)} 
+        <input
+          id="remember"
+          type="checkbox"
+          checked={remember}
+          onChange={(e) => setRemember(e.target.checked)}
           className="h-4 w-4"
           disabled={loading}
         />
         <label htmlFor="remember" className="text-sm text-neutral-dark">Se souvenir de mon mot de passe</label>
       </div>
 
-      <PrimaryButton 
-        label={loading ? "Connexion..." : "Connexion"} 
-        type="submit" 
+      <PrimaryButton
+        label={loading ? "Connexion..." : "Connexion"}
+        type="submit"
         className="w-full"
         disabled={loading}
       />

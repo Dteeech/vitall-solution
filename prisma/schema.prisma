@@ -31,8 +31,8 @@ model User {
   firstName      String
   lastName       String
   role           UserRole  @default(USER)
-  organization   Organization @relation(fields: [organizationId], references: [id])
-  organizationId String
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organizationId String?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 }

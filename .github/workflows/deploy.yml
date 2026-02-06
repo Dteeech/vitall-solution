@@ -1,44 +1,4 @@
-name: CI/CD Vitall
-
-on:
-  push:
-    branches: [ main, develop ]
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
-
-jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Lowercase image name
-        run: echo "IMAGE_NAME_LOWER=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-
-      - name: Log in to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LOWER }}:latest
-          # On passe les dummy keys pour que le build Next.js ne plante pas
-          build-args: |
-            STRIPE_SECRET_KEY=dummy
-            NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=dummyname: 🚀 Build and Deploy Vitall
+name: 🚀 Build and Deploy Vitall
 
 on:
   push:
@@ -82,10 +42,32 @@ jobs:
             STRIPE_SECRET_KEY=dummy
             NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=dummy
 
+  quality:
+    name: 🔍 SonarQube Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: 🔍 SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      
+      - name: 🚦 SonarQube Quality Gate Check
+        uses: SonarSource/sonarqube-quality-gate-action@v1.0.3
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
   deploy:
     name: 🚢 Deploy to VPS
     runs-on: ubuntu-latest
-    needs: build
+    needs: [build, quality]
     steps:
       - name: 🔑 Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3

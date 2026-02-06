@@ -9,14 +9,14 @@ export default function LandingPage() {
     <div className="flex min-h-screen flex-col bg-neutral-50 font-sans">
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-secondary-900 shadow-sm">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
+        <div className="container mx-auto flex items-center justify-between px-4 md:px-6">
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/assets/images/Logo-Blanc-avec-texte.png"
               alt="Vitall Logo"
-              width={120}
-              height={40}
-              className="h-8 w-auto"
+              width={240}
+              height={80}
+              className="h-20 w-auto pt-2 pb-2"
             />
           </Link>
           <nav className="flex items-center gap-6">

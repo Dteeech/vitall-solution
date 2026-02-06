@@ -42,6 +42,25 @@ jobs:
             STRIPE_SECRET_KEY=dummy
             NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=dummy
 
+  tests:
+    name: 🧪 Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 🧪 Run Tests
+        run: npm run test
+
   quality:
     name: 🔍 SonarQube Analysis
     runs-on: ubuntu-latest
@@ -60,7 +79,8 @@ jobs:
   deploy:
     name: 🚢 Deploy to VPS
     runs-on: ubuntu-latest
-    needs: [build, quality]
+    needs: [build, quality, tests]
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: 🔑 Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3

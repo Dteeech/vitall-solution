@@ -91,6 +91,6 @@ jobs:
           port: ${{ secrets.DEPLOY_PORT }}
           script: |
             cd /home/${{ secrets.DEPLOY_USER }}/apps/vitall
-            docker compose pull
+            docker compose pull app
             docker compose up -d
             docker system prune -f

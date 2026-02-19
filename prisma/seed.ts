@@ -1,5 +1,6 @@
 
 import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
@@ -28,6 +29,8 @@ const modulesData = [
 
 async function main() {
   console.log(`Start seeding ...`);
+
+  // Seed modules
   for (const moduleData of modulesData) {
     const result = await prisma.module.upsert({
       where: { name: moduleData.name },
@@ -36,6 +39,65 @@ async function main() {
     });
     console.log(`Upserted module: ${result.name}`);
   }
+
+  // Créer une organisation de test
+  const organizationAdmin = await prisma.organization.upsert({
+    where: { id: 'org-admin-id' },
+    update: {},
+    create: {
+      name: 'Organisation Admin test',
+      address: '4 chemin de la Chatterie, 44100 Saint-Herblain',
+    },
+  });
+  console.log(`Upserted organization: ${organizationAdmin.name}`);
+
+  const organizationUser = await prisma.organization.upsert({
+    where: { id: 'org-user-id' },
+    update: {},
+    create: {
+      name: 'Organisation de USER test',
+      address: '4 chemin de la Chatterie, 44100 Saint-Herblain',
+    },
+  });
+  console.log(`Upserted organization: ${organizationUser.name}`);
+  
+  // Hash des mots de passe depuis les variables d'environnement
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD || 'ChangeMeInProduction!';
+  const userPassword = process.env.SEED_USER_PASSWORD || 'ChangeMeInProduction!';
+  
+  const hashedAdminPassword = await bcrypt.hash(adminPassword, 10);
+  const hashedUserPassword = await bcrypt.hash(userPassword, 10);
+
+  // Création Admin
+  const admin = await prisma.user.upsert({
+    where: { email: 'admin@test.fr' },
+    update: {},
+    create: {
+      email: 'admin@test.fr',
+      password: hashedAdminPassword,
+      role: 'ADMIN',
+      firstName: 'Admin',
+      lastName: 'Vitall',
+      organizationId: organizationAdmin.id,
+    },
+  });
+  console.log(`Upserted admin user: ${admin.email}`);
+
+  // Création User Standard
+  const user = await prisma.user.upsert({
+    where: { email: 'user@test.fr' },
+    update: {},
+    create: {
+      email: 'user@test.fr',
+      password: hashedUserPassword,
+      role: 'USER',
+      firstName: 'User',
+      lastName: 'Vitall',
+      organizationId: organizationUser.id,
+    },
+  });
+  console.log(`Upserted standard user: ${user.email}`);
+
   console.log(`Seeding finished.`);
 }
 

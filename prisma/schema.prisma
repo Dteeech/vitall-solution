@@ -23,28 +23,52 @@ enum SubscriptionStatus {
   CANCELLED
 }
 
+enum CandidatureStatus {
+  PENDING
+  INTERVIEW
+  ACCEPTED
+  REJECTED
+}
+
+enum ShiftType {
+  GARDE
+  ASTREINTE
+  FORMATION
+  REUNION
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 // Models
 model User {
-  id             String    @id @default(uuid())
-  email          String    @unique
+  id             String         @id @default(uuid())
+  email          String         @unique
   password       String // Hashed password
   firstName      String
   lastName       String
-  role           UserRole  @default(USER)
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  role           UserRole       @default(USER)
+  organization   Organization   @relation(fields: [organizationId], references: [id])
   organizationId String
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  shifts         Shift[]
+  leaveRequests  LeaveRequest[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 }
 
 model Organization {
-  id           String    @id @default(uuid())
-  name         String
-  address      String?
-  users        User[]
-  subscription Subscription?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id                  String               @id @default(uuid())
+  name                String
+  address             String?
+  users               User[]
+  subscription        Subscription?
+  candidatures        Candidature[]
+  plannings           Planning[]
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
 }
 
 model Module {
@@ -83,4 +107,50 @@ model SubscriptionModule {
   assignedAt     DateTime   @default(now())
 
   @@unique([subscriptionId, moduleId]) // Ensures a module can only be assigned once per subscription
+}
+
+// --- NOUVEAUX MODELS ---
+
+model Candidature {
+  id              String   @id @default(uuid())
+  firstName       String
+  lastName        String
+  email           String
+  phone           String?
+  cvUrl           String?  // Lien vers le CV stocké
+  status          CandidatureStatus @default(PENDING) // PENDING, ACCEPTED, REJECTED, INTERVIEW
+  organization    Organization @relation(fields: [organizationId], references: [id])
+  organizationId  String
+  appliedAt       DateTime @default(now())
+}
+
+model Planning {
+  id              String   @id @default(uuid())
+  name            String   // Ex: "Planning Semaine 12" ou "Equipe A"
+  organization    Organization @relation(fields: [organizationId], references: [id])
+  organizationId  String
+  shifts          Shift[]
+}
+
+model Shift {
+  id              String   @id @default(uuid())
+  planning        Planning @relation(fields: [planningId], references: [id])
+  planningId      String
+  user            User?    @relation(fields: [userId], references: [id]) // Peut être null si créneau ouvert
+  userId          String?
+  startTime       DateTime
+  endTime         DateTime
+  type            ShiftType // GARDE, ASTREINTE, FORMATION
+  isAvailable     Boolean  @default(true) // Créneau ouvert à la réservation ?
+}
+
+model LeaveRequest {
+  id              String   @id @default(uuid())
+  user            User     @relation(fields: [userId], references: [id])
+  userId          String
+  startDate       DateTime
+  endDate         DateTime
+  reason          String?
+  status          LeaveStatus @default(PENDING) // PENDING, APPROVED, REJECTED
+  approvedBy      String?  // ID du manager qui a validé
 }

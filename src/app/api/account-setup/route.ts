@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import bcrypt from "bcryptjs"
 
 type AccountSetupRequest = {
   organizationName: string
@@ -31,9 +32,8 @@ export async function POST(request: Request) {
       )
     }
 
-    // TODO: Hash password avec bcrypt
-    // const hashedPassword = await bcrypt.hash(password, 10)
-    const hashedPassword = password // TEMPORAIRE - À REMPLACER
+    // Hash password avec bcrypt
+    const hashedPassword = await bcrypt.hash(password, 10)
 
     // Vérifier si l'email existe déjà
     const existingUser = await prisma.user.findUnique({

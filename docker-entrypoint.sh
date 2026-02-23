@@ -1,15 +1,24 @@
 #!/bin/sh
 set -e
 
-echo "🔄 Running Prisma migrations..."
+if [ "$NODE_ENV" = "development" ]; then
+  echo "🛠️ Mode DÉVELOPPEMENT activé"
+  
+  echo "📦 1/3 - Installation des dépendances manquantes..."
+  npm install --force
+  
+  echo "🔄 2/3 - Mise à jour de la base de données (Prisma)..."
+  npx prisma@6 db push --accept-data-loss
+  
+  echo "🚀 3/3 - Démarrage du Hot Reload..."
+  exec npm run dev
 
-# Push database schema (creates tables if they don't exist)
-# Utiliser prisma@6 pour rester compatible avec le schema actuel (Prisma 7 a des breaking changes)
-npx prisma@6 db push --accept-data-loss
-
-echo "✅ Migrations completed successfully"
-
-echo "🚀 Starting Next.js application..."
-
-# Start the Next.js server
-exec node server.js
+else
+  echo "🌍 Mode PRODUCTION activé"
+  
+  echo "🔄 1/2 - Mise à jour de la base de données (Prisma)..."
+  npx prisma@6 db push --accept-data-loss
+  
+  echo "🚀 2/2 - Démarrage du serveur optimisé..."
+  exec node server.js
+fi

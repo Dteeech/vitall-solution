@@ -32,6 +32,9 @@ RUN npm run build
 # ====================================
 FROM node:20-alpine AS runner
 
+# Mise à jour de npm pour corriger les vulnérabilités de sécurité détectées par Snyk
+RUN npm install -g npm@11.6.4
+
 RUN apk add --no-cache openssl
 
 WORKDIR /app

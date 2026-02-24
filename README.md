@@ -13,6 +13,7 @@
 - [Structure du projet](#-structure-du-projet)
 - [Installation & Démarrage](#-installation--démarrage)
 - [Docker](#-docker)
+- [Observabilité & Monitoring](#-observabilité--monitoring)
 - [Pipeline CI/CD](#-pipeline-cicd)
 - [Sécurité & DevSecOps](#-sécurité--devsecops)
 - [Authentification](#-authentification)
@@ -41,6 +42,7 @@
 | **CI/CD**             | GitHub Actions                                            |
 | **Qualité de code**   | ESLint + SonarQube                                        |
 | **Sécurité**          | Snyk (Container Scan)                                     |
+| **Observabilité**     | Prometheus + Grafana + Loki (prom-client)                |
 | **Conteneurisation**  | Docker (multi-stage, Alpine Linux)                        |
 | **Déploiement**       | VPS via SSH (Dokploy)                                     |
 
@@ -198,6 +200,242 @@ docker compose exec -T postgres psql -U vitall_user vitall_db < backup.sql
 
 # Nettoyage complet (⚠️ perte de données)
 docker compose down -v && docker system prune -a
+```
+
+---
+
+## 📊 Observabilité & Monitoring
+
+Le projet intègre une stack complète d'observabilité basée sur **Prometheus**, **Grafana** et **Loki** pour monitorer les performances applicatives et conteneurs.
+
+### Architecture de monitoring
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         Stack d'Observabilité                           │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  ┌──────────┐    scrape     ┌────────────┐                            │
+│  │ Next.js  │──────────────>│            │                            │
+│  │ App      │  /api/metrics │ Prometheus │──────┐                     │
+│  │ :3000    │               │ :9090      │      │                     │
+│  └──────────┘               └────────────┘      │                     │
+│                                                  │ push                │
+│  ┌──────────┐    scrape     ┌────────────┐      ▼                     │
+│  │ cAdvisor │──────────────>│  Grafana   │                            │
+│  │ :8080    │  /metrics     │  :3001     │                            │
+│  │          │               │            │                            │
+│  │(Docker   │               │ Dashboard  │                            │
+│  │ metrics) │               │ & Viz      │                            │
+│  └──────────┘               └────────────┘                            │
+│                                    ▲                                   │
+│  ┌──────────┐    push        ┌────┴────┐                              │
+│  │ Promtail │───────────────>│  Loki   │                              │
+│  │          │    logs        │  :3100  │                              │
+│  │(Docker   │                │         │                              │
+│  │ logs)    │                │ Log     │                              │
+│  └──────────┘                │ Storage │                              │
+│                               └─────────┘                              │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Services de monitoring
+
+| Service      | Port | Description                                          |
+| ------------ | ---- | ---------------------------------------------------- |
+| **Prometheus** | 9090 | Collecte et stockage des métriques time-series      |
+| **Grafana**    | 3001 | Visualisation de métriques et logs                  |
+| **Loki**       | 3100 | Agrégation et stockage des logs                     |
+| **Promtail**   | -    | Agent de collecte des logs Docker                   |
+
+### Métriques exposées
+
+L'application Next.js expose ses propres métriques via `/api/metrics` (via `prom-client`) :
+
+#### Métriques applicatives & Processus
+- `app_uptime_seconds` : Temps depuis le démarrage de l'application
+- `http_requests_total` : Nombre total de requêtes HTTP (par méthode, route, status)
+- `http_request_duration_seconds` : Latence des requêtes HTTP (histogramme)
+- `process_cpu_usage_percent` : Usage CPU du processus Node.js
+- `process_resident_memory_bytes` : Usage mémoire RAM réelle du processus
+- `process_heap_bytes` : Taille du tas (heap) Node.js
+
+### Démarrage de la stack de monitoring
+
+```bash
+# 1. Assurez-vous que les fichiers de config sont présents
+ls prometheus.yml loki-config.yml promtail-config.yml
+ls -R grafana/
+
+# 2. Lancer tous les services (app + monitoring)
+docker compose up -d
+
+# 3. Vérifier que tous les services sont UP
+docker compose ps
+
+# 4. Attendre quelques secondes pour l'initialisation
+sleep 15
+```
+
+### Accès aux interfaces
+
+| Interface       | URL                     | Credentials          |
+| --------------- | ----------------------- | -------------------- |
+| **Application** | http://localhost:3000   | (voir section Comptes de test) |
+| **Grafana**     | http://localhost:3001   | `admin` / `admin`    |
+| **Prometheus**  | http://localhost:9090   | Pas d'auth           |
+
+### Visualiser les métriques dans Grafana
+
+1. **Accéder à Grafana**
+   ```bash
+   open http://localhost:3001
+   # Login: admin / admin
+   ```
+
+2. **Dashboard pré-configuré**
+   - Allez dans **Dashboards** → **"Vitall Monitoring Dashboard V2"**
+   - Le dashboard affiche automatiquement :
+     - ✅ **Application Status** : Service vivant (UP/DOWN)
+     - 📈 **Application Uptime** : Temps depuis le démarrage
+     - 🖥️ **Application CPU Usage** : Utilisation CPU du processus %
+     - 💾 **Application Memory Usage** : Utilisation RAM du processus
+     - 🌐 **HTTP Requests Rate** : Requêtes/seconde par endpoint
+     - ⏱️ **HTTP Request Duration** : Latence P95 & P99
+     - 📋 **Application Logs** : Logs en temps réel
+
+3. **Générer du trafic pour visualiser les métriques**
+   ```bash
+   # Générer 100 requêtes HTTP sur le healthcheck instrumenté
+   for i in {1..100}; do curl -s http://localhost:3000/api/health > /dev/null; done
+
+   # Observer les métriques dans Grafana
+3. Utilisez ces requêtes LogQL :
+
+```logql
+# Tous les logs de l'application
+{container_name=~".*vitall.*app.*"}
+
+# Logs avec filtrage par niveau (si structurés)
+{container_name=~".*vitall.*app.*"} |= "error"
+
+# Logs des 5 dernières minutes
+{container_name=~".*vitall.*app.*"} [5m]
+
+# Comptage d'erreurs
+count_over_time({container_name=~".*vitall.*app.*"} |= "error" [5m])
+```
+
+### Requêtes Prometheus utiles
+
+Accédez à http://localhost:9090/graph et testez :
+
+```promql
+# Vérifier que l'app est UP
+up{job="vitall-app"}
+
+# Uptime en heures
+app_uptime_seconds / 3600
+
+# Requêtes HTTP par seconde (moyenne 5 min)
+rate(http_requests_total[5m])
+
+# Latence P95
+histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))
+
+# Usage CPU du conteneur (en %)
+rate(container_cpu_usage_seconds_total{name=~".*vitall.*app.*"}[5m]) * 100
+
+# Usage mémoire du conteneur (en MB)
+container_memory_usage_bytes{name=~".*vitall.*app.*"} / 1024 / 1024
+
+# Trafic réseau entrant (KB/s)
+rate(container_network_receive_bytes_total{name=~".*vitall.*app.*"}[5m]) / 1024
+```
+
+### Configuration des alertes (optionnel)
+
+Pour configurer des alertes Prometheus :
+
+1. Créer un fichier `prometheus-alerts.yml` :
+   ```yaml
+   groups:
+     - name: vitall-alerts
+       interval: 30s
+       rules:
+         - alert: ServiceDown
+           expr: up{job="vitall-app"} == 0
+           for: 1m
+           labels:
+             severity: critical
+           annotations:
+             summary: "Service Vitall is down"
+         
+         - alert: HighMemoryUsage
+           expr: container_memory_usage_bytes{name=~".*vitall.*app.*"} > 500000000
+           for: 5m
+           labels:
+             severity: warning
+           annotations:
+             summary: "Memory usage > 500MB"
+   ```
+
+2. Ajouter dans `prometheus.yml` :
+   ```yaml
+   rule_files:
+     - "prometheus-alerts.yml"
+   ```
+
+3. Redémarrer Prometheus :
+   ```bash
+   docker compose restart prometheus
+   ```
+
+### Rétention des données
+
+| Service      | Rétention | Configuration                          |
+| ------------ | --------- | -------------------------------------- |
+| **Prometheus** | 15 jours  | `--storage.tsdb.retention.time=15d`   |
+| **Loki**       | 7 jours   | `retention_period: 168h` dans loki-config.yml |
+
+### Troubleshooting
+
+**Prometheus ne scrape pas les métriques de l'app**
+```bash
+# Vérifier que l'endpoint répond
+curl http://localhost:3000/api/metrics
+
+# Vérifier les targets dans Prometheus
+open http://localhost:9090/targets
+# → Toutes les targets doivent être "UP"
+```
+
+**Grafana ne se connecte pas aux datasources**
+```bash
+# Vérifier la connectivité réseau
+docker compose exec grafana wget -O- http://prometheus:9090/-/healthy
+docker compose exec grafana wget -O- http://loki:3100/ready
+
+# Redémarrer Grafana
+docker compose restart grafana
+```
+
+**Pas de logs dans Loki**
+```bash
+# Vérifier que Promtail collecte bien les logs
+docker compose logs promtail | grep "successfully"
+
+# Vérifier les labels dans Loki
+# Dans Grafana Explore: {container_name!=""}
+```
+
+**Dashboard Grafana vide**
+```bash
+# Attendre que les métriques soient scrapées (15-30 secondes)
+# Générer du trafic artificiel
+for i in {1..50}; do curl -s http://localhost:3000/api/health > /dev/null; done
+
+# Ajuster la fenêtre temporelle dans Grafana (top-right) à "Last 5 minutes"
 ```
 
 ---

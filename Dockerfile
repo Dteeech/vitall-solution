@@ -1,12 +1,13 @@
 # ====================================
 # Stage 1: Builder
 # ====================================
-FROM node:20-slim AS builder
+FROM node:20-alpine AS builder
+
+# Mise à jour de npm pour corriger les vulnérabilités de sécurité
+RUN npm install -g npm@11.6.4
 
 # Installation d'OpenSSL (Nécessaire pour Prisma)
-RUN apt-get update -y && \
-    apt-get install -y openssl && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache openssl
 
 WORKDIR /app
 
@@ -29,11 +30,9 @@ RUN npm run build
 # ====================================
 # Stage 2: Runner (Production)
 # ====================================
-FROM node:20-slim AS runner
+FROM node:20-alpine AS runner
 
-RUN apt-get update -y && \
-    apt-get install -y openssl && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache openssl
 
 WORKDIR /app
 

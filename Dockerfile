@@ -32,10 +32,12 @@ RUN npm run build
 # ====================================
 FROM node:20-alpine AS runner
 
-# Mise à jour de npm pour corriger les vulnérabilités de sécurité détectées par Snyk
-RUN npm install -g npm@11.6.4
-
 RUN apk add --no-cache openssl
+
+# Installer Prisma CLI pour les migrations, puis supprimer npm (surface d'attaque inutile en production)
+RUN npm install -g prisma@6 && \
+    npm cache clean --force && \
+    rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
 
 WORKDIR /app
 

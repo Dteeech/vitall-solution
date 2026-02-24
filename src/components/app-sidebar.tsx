@@ -133,8 +133,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <Image
               src={logoBlanc}
               alt="Vitall"
-              width={108}
-              height={32}
+              width={70}
+              height={30}
               className="object-contain group-data-[collapsible=icon]:hidden"
             />
           </Link>

@@ -209,34 +209,33 @@ Le pipeline GitHub Actions (`.github/workflows/deploy.yml`) est déclenché à c
 ### Schéma du pipeline
 
 ```
-┌──────────────────────────────────────────────────────────────────────┐
-│                     Push sur main / develop                         │
-└──────────────────────────┬───────────────────────────────────────────┘
-                           │
-            ┌──────────────┼──────────────┐
-            ▼              ▼              ▼
-    ┌──────────────┐ ┌──────────┐ ┌──────────────┐
-    │ 🏗️ Build,    │ │ 🧪 Tests │ │ 🔍 SonarQube │
-    │ Scan & Push  │ │ unitaires│ │ Analysis     │
-    │              │ │          │ │              │
-    │ 1. Build img │ │ npm ci   │ │ Qualité code │
-    │ 2. Snyk Scan │ │ vitest   │ │              │
-    │ 3. Push GHCR │ │          │ │              │
-    └──────┬───────┘ └────┬─────┘ └──────────────┘
-           │              │
-           └──────┬───────┘
-                  ▼
-        ┌──────────────────┐
-        │ 🚢 Deploy to VPS │  (main uniquement)
-        │                  │
-        │ SSH → pull → up  │
-        └──────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+│                             Push sur main / develop                                         │
+└───────────────────────────────────┬─────────────────────────────────────────────────────────┘
+                                    │
+            ┌───────────────────────┼──────────────┬────────────────────────┐
+            ▼                       ▼              ▼                        ▼
+    ┌───────────────┐        ┌──────────┐   ┌──────────────┐        ┌───────────────┐
+    │ 🏗️ Build,     │        │ 🧪 Tests │   │ 🔍 SonarQube │        │ 🔑 Gitleaks   │
+    │ Scan & Push   │        │ unitaires│   │ Analysis     │        │ Scan (Secrets)│
+    │               │        │          │   │              │        │               │
+    │ 1. Build img  │        │ npm ci   │   │ Qualité code │        │ Scan de tout  │
+    │ 2. Snyk Scan  │        │ vitest   │   │              │        │ l'historique  │
+    │ 3. Push GHCR  │        │          │   │              │        │               │
+    └───────┬───────┘        └────┬─────┘   └──────┬───────┘        └───────┬───────┘
+            │                     │                │                        │
+            └───────────┬─────────┴────────────────┴──────────┬─────────────┘
+                        ▼                                     │
+              ┌──────────────────┐                            │
+              │ 🚢 Deploy to VPS │  (main uniquement)         │
+              │                  │                            │
+              │ SSH → pull → up  │                            │
+              └──────────────────┘                            │
 ```
 
 ### Jobs détaillés
 
 #### 1. Build, Scan & Push (`build`)
-
 1. **Checkout** du code source
 2. **Login** au GitHub Container Registry (GHCR)
 3. **Build local** de l'image Docker (sans push, pour le scan)
@@ -244,18 +243,18 @@ Le pipeline GitHub Actions (`.github/workflows/deploy.yml`) est déclenché à c
 5. **Push** de l'image sur `ghcr.io` si le scan est passé
 
 #### 2. Tests unitaires (`tests`)
-
 - Setup Node.js 20 avec cache npm
 - `npm ci` puis `npm run test` (Vitest)
 
 #### 3. Analyse de qualité (`quality`)
-
 - Scan SonarQube (qualité du code, code smells, couverture)
 
-#### 4. Déploiement (`deploy`)
+#### 4. Détection de secrets (`secrets_scan`)
+- Analyse de tout l'historique Git via **Gitleaks** pour détecter d'éventuels secrets (clés API, mots de passe) commis par erreur.
 
+#### 5. Déploiement (`deploy`)
 - Uniquement sur la branche `main`
-- Dépend du succès de `build` et `tests`
+- Dépend du succès de **tous** les jobs précédents
 - Connexion SSH au VPS → `docker compose pull` → `docker compose up -d`
 
 ### Secrets GitHub requis
@@ -263,8 +262,9 @@ Le pipeline GitHub Actions (`.github/workflows/deploy.yml`) est déclenché à c
 | Secret                    | Description                          |
 | ------------------------- | ------------------------------------ |
 | `SNYK_TOKEN`              | Token API Snyk (container scan)      |
-| `SONAR_TOKEN`             | Token SonarQube                      |
+| `SONAR_TOKEN`              | Token SonarQube                      |
 | `SONAR_HOST_URL`          | URL de l'instance SonarQube          |
+| `GITHUB_TOKEN`            | Fourni par GitHub (utilisé par Gitleaks) |
 | `DEPLOY_HOST`             | IP/hostname du VPS                   |
 | `DEPLOY_USER`             | Utilisateur SSH                      |
 | `DEPLOY_KEY`              | Clé privée SSH                       |
@@ -282,7 +282,14 @@ Dans le cadre de notre démarche **DevSecOps**, nous avons intégré **Snyk** co
 2. **Aide à la remédiation** : Il propose des chemins de mise à jour concrets (ex: suggérer une image de base plus récente et moins vulnérable, ou upgrader un paquet npm spécifique) plutôt que de simples alertes.
 3. **Filtrage par sévérité** : Notre pipeline est configuré avec `--severity-threshold=high` pour bloquer tout déploiement contenant des vulnérabilités de niveau **High** ou **Critical**, tout en laissant passer les Low/Medium.
 
-Cette intégration applique le principe du **"Shift Left Security"** : la sécurité est vérifiée dès l'étape de build, avant même que l'image ne soit poussée sur le registre. Cela permet d'automatiser la sécurité sans ralentir le cycle de développement, en apportant des retours immédiats aux développeurs directement dans la CI.
+### Pourquoi Gitleaks pour la Détection de Secrets ?
+
+En complément du scan de conteneur, nous utilisons **Gitleaks** pour prévenir la fuite de données sensibles. Cet outil :
+1. **Analyse l'historique complet** : Il ne se contente pas de scanner le dernier commit, mais parcourt tout l'historique Git pour détecter des secrets précédemment validés.
+2. **Détection par signatures** : Il utilise des expressions régulières avancées pour identifier des formats spécifiques (clés AWS, Stripe, tokens GitHub, etc.).
+3. **Bloquant par défaut** : Si un secret est détecté, le pipeline échoue immédiatement, forçant le développeur à révoquer la clé et à nettoyer l'historique Git.
+
+Cette intégration applique le principe du **"Shift Left Security"** : la sécurité est vérifiée dès l'étape de build ou de code, avant même que l'image ne soit poussée sur le registre ou déployée en production.
 
 ### Mesures de sécurité appliquées
 
@@ -290,9 +297,11 @@ Cette intégration applique le principe du **"Shift Left Security"** : la sécur
 | ----------------------------- | ------------------------------------------------------------------------- |
 | **Image de base Alpine**      | `node:20-alpine` — 0 vulnérabilité critique (vs 41 pour `node:20-slim`)  |
 | **npm supprimé en production**| Élimine les vulnérabilités de `cross-spawn`, `glob`, `minimatch`, `tar`   |
+| **Scan de conteneur (Snyk)**  | Bloque les vulnérabilités système et applicatives High/Critical           |
+| **Détection secrets (Gitleaks)**| Empêche le commit de clés API ou mots de passe dans le repo             |
+| **Qualité code (SonarQube)**  | Détecte les vulnérabilités logiques et les mauvais patterns de code       |
 | **Utilisateur non-root**      | Le conteneur tourne sous l'utilisateur `nextjs` (UID 1001)                |
 | **Build multi-stage**         | L'image finale ne contient que le strict nécessaire (standalone)           |
-| **Scan bloquant en CI**       | Aucune image vulnérable ne peut atteindre le registre ou la production     |
 | **JWT httpOnly**              | Les tokens sont stockés dans des cookies httpOnly, secure en production    |
 | **Mots de passe hashés**      | bcrypt avec 10 rounds de salage                                            |
 | **Middleware RBAC**           | Protection des routes par rôle (ADMIN / USER) dans le middleware Next.js   |

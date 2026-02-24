@@ -104,8 +104,8 @@ export function UserSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
           <Image
             src={logoBlanc}
             alt="Vitall"
-            width={120}
-            height={40}
+            width={70}
+            height={30}
             className="group-data-[state=collapsed]:hidden"
           />
           <div className="hidden group-data-[state=collapsed]:block">

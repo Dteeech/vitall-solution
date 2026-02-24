@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: 🏗️ Build and Push Image
+    name: 🏗️ Build, Scan and Push Image
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -31,7 +31,27 @@ jobs:
         env:
           GITHUB_REPOSITORY: "${{ github.repository }}"
 
-      - name: 🐳 Build and Push Docker image
+      - name: 🐳 Build Docker image (Local)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true # Charge l'image dans le Docker daemon local pour le scan
+          tags: ${{ env.REPO_SLUG }}:scan
+          build-args: |
+            STRIPE_SECRET_KEY=dummy
+            NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=dummy
+
+      - name: 🛡️ Snyk Container Scan
+        id: snyk-scan
+        uses: snyk/actions/docker@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: ${{ env.REPO_SLUG }}:scan
+          args: --severity-threshold=high --file=Dockerfile
+
+      - name: 🚀 Push Docker image
+        if: success() # Ne s'exécute que si le scan Snyk est passé
         uses: docker/build-push-action@v5
         with:
           context: .

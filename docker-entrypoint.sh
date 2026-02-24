@@ -17,7 +17,7 @@ else
   echo "🌍 Mode PRODUCTION activé"
   
   echo "🔄 1/2 - Mise à jour de la base de données (Prisma)..."
-  npx prisma@6 db push --accept-data-loss
+  prisma db push --accept-data-loss
   
   echo "🚀 2/2 - Démarrage du serveur optimisé..."
   exec node server.js

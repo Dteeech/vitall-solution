@@ -613,8 +613,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Vitall Monitoring Dashboard V2",
-  "uid": "vitall-monitoring-v2",
+  "title": "Vitall Monitoring Dashboard",
+  "uid": "vitall-monitoring",
   "version": 1,
   "weekStart": ""
 }

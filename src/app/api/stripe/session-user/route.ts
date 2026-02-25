@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server"
 import Stripe from "stripe"
 import { prisma } from "@/lib/prisma"
+import { withMetrics } from "@/lib/withMetrics"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2026-01-28.clover",
 })
 
-export async function GET(request: Request) {
+export const GET = withMetrics(async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const sessionId = searchParams.get("session_id")
@@ -58,4 +59,4 @@ export async function GET(request: Request) {
       { status: 500 }
     )
   }
-}
+})

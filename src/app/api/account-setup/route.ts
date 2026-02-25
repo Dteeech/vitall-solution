@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
+import { withMetrics } from "@/lib/withMetrics"
 
 type AccountSetupRequest = {
   organizationName: string
@@ -11,7 +12,7 @@ type AccountSetupRequest = {
   selectedModuleNames: string[]
 }
 
-export async function POST(request: Request) {
+export const POST = withMetrics(async function POST(request: Request) {
   try {
     const body: AccountSetupRequest = await request.json()
 
@@ -136,4 +137,4 @@ export async function POST(request: Request) {
       { status: 500 }
     )
   }
-}
+})

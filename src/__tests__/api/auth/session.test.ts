@@ -30,7 +30,7 @@ describe('GET /api/auth/session', () => {
 
   it('retourne 401 sans cookie', async () => {
     mockCookiesGet.mockReturnValueOnce(undefined)
-    const res = await GET()
+    const res = await GET(new Request('http://localhost/api/auth/session'))
     expect(res.status).toBe(401)
     const data = await res.json()
     expect(data.authenticated).toBe(false)
@@ -39,7 +39,7 @@ describe('GET /api/auth/session', () => {
   it('retourne 401 si le token est invalide', async () => {
     mockCookiesGet.mockReturnValueOnce({ value: 'bad-token' })
     vi.mocked(jwtVerify).mockRejectedValueOnce(new Error('invalid'))
-    const res = await GET()
+    const res = await GET(new Request('http://localhost/api/auth/session'))
     expect(res.status).toBe(401)
   })
 
@@ -51,7 +51,7 @@ describe('GET /api/auth/session', () => {
     } as never)
     vi.mocked(prisma.user.findUnique).mockResolvedValueOnce(null)
 
-    const res = await GET()
+    const res = await GET(new Request('http://localhost/api/auth/session'))
     expect(res.status).toBe(401)
   })
 
@@ -70,7 +70,7 @@ describe('GET /api/auth/session', () => {
       organization: { id: 'org1', name: 'Org' },
     } as never)
 
-    const res = await GET()
+    const res = await GET(new Request('http://localhost/api/auth/session'))
     expect(res.status).toBe(200)
     const data = await res.json()
     expect(data.authenticated).toBe(true)

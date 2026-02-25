@@ -3,12 +3,13 @@ import { prisma } from "@/lib/prisma"
 import { SignJWT } from "jose"
 import { cookies } from "next/headers"
 import bcrypt from "bcryptjs"
+import { withMetrics } from "@/lib/withMetrics"
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || "votre-secret-super-securise-changez-moi"
 )
 
-export async function POST(request: Request) {
+export const POST = withMetrics(async function POST(request: Request) {
   try {
     const { email, password } = await request.json()
 
@@ -89,4 +90,4 @@ export async function POST(request: Request) {
       { status: 500 }
     )
   }
-}
+})

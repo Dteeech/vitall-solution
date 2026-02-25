@@ -1,52 +1,74 @@
 import { Registry, Counter, Histogram, Gauge, collectDefaultMetrics } from 'prom-client';
 
-// Create a custom registry
-export const register = new Registry();
+// ---------------------------------------------------------------------------
+// Singleton : évite les duplications lors du hot-reload Next.js en dev
+// ---------------------------------------------------------------------------
+const globalForMetrics = globalThis as unknown as { metricsRegistry?: Registry };
 
-// Collect default metrics (CPU, memory, event loop, etc.)
-collectDefaultMetrics({ register });
+export const register = globalForMetrics.metricsRegistry ?? new Registry();
 
-// Application uptime in seconds
-export const appUptimeGauge = new Gauge({
-  name: 'app_uptime_seconds',
-  help: 'Time in seconds since the application started',
-  registers: [register],
-});
+if (!globalForMetrics.metricsRegistry) {
+  globalForMetrics.metricsRegistry = register;
+  collectDefaultMetrics({ register });
+}
 
-// Process CPU usage percentage
-export const processCpuUsage = new Gauge({
-  name: 'process_cpu_usage_percent',
-  help: 'CPU usage percentage of the Node.js process',
-  registers: [register],
-});
+// --- Gauge : app_uptime_seconds ---
+export const appUptimeGauge =
+  (register.getSingleMetric('app_uptime_seconds') as Gauge<string>) ??
+  new Gauge({
+    name: 'app_uptime_seconds',
+    help: 'Time in seconds since the application started',
+    registers: [register],
+  });
 
-// Process memory usage in bytes
-export const processMemoryUsage = new Gauge({
-  name: 'process_memory_usage_bytes',
-  help: 'Memory usage in bytes of the Node.js process',
-  labelNames: ['type'], // 'rss', 'heapUsed', 'heapTotal', 'external'
-  registers: [register],
-});
+// --- Gauge : process_cpu_usage_percent ---
+export const processCpuUsage =
+  (register.getSingleMetric('process_cpu_usage_percent') as Gauge<string>) ??
+  new Gauge({
+    name: 'process_cpu_usage_percent',
+    help: 'CPU usage percentage of the Node.js process',
+    registers: [register],
+  });
 
-// HTTP requests total counter
-export const httpRequestsTotal = new Counter({
-  name: 'http_requests_total',
-  help: 'Total number of HTTP requests',
-  labelNames: ['method', 'route', 'status_code'],
-  registers: [register],
-});
+// --- Gauge : process_memory_usage_bytes ---
+export const processMemoryUsage =
+  (register.getSingleMetric('process_memory_usage_bytes') as Gauge<string>) ??
+  new Gauge({
+    name: 'process_memory_usage_bytes',
+    help: 'Memory usage in bytes of the Node.js process',
+    labelNames: ['type'], // 'rss', 'heapUsed', 'heapTotal', 'external'
+    registers: [register],
+  });
 
-// HTTP request duration histogram
-export const httpRequestDuration = new Histogram({
-  name: 'http_request_duration_seconds',
-  help: 'Duration of HTTP requests in seconds',
-  labelNames: ['method', 'route', 'status_code'],
-  buckets: [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10], // Buckets in seconds
-  registers: [register],
-});
+// --- Counter : http_requests_total ---
+export const httpRequestsTotal =
+  (register.getSingleMetric('http_requests_total') as Counter<string>) ??
+  new Counter({
+    name: 'http_requests_total',
+    help: 'Total number of HTTP requests',
+    labelNames: ['method', 'route', 'status_code'],
+    registers: [register],
+  });
 
-// Track application start time
-const appStartTime = Date.now();
+// --- Histogram : http_request_duration_seconds ---
+export const httpRequestDuration =
+  (register.getSingleMetric('http_request_duration_seconds') as Histogram<string>) ??
+  new Histogram({
+    name: 'http_request_duration_seconds',
+    help: 'Duration of HTTP requests in seconds',
+    labelNames: ['method', 'route', 'status_code'],
+    buckets: [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10],
+    registers: [register],
+  });
+
+// ---------------------------------------------------------------------------
+// Track application start time (singleton-safe)
+// ---------------------------------------------------------------------------
+const globalForUptime = globalThis as unknown as { metricsStartTime?: number };
+const appStartTime = globalForUptime.metricsStartTime ?? Date.now();
+if (!globalForUptime.metricsStartTime) {
+  globalForUptime.metricsStartTime = appStartTime;
+}
 
 /**
  * Update uptime metric

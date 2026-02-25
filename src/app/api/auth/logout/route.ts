@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
+import { withMetrics } from "@/lib/withMetrics"
 
-export async function POST() {
+export const POST = withMetrics(async function POST() {
   try {
     const cookieStore = await cookies()
     cookieStore.delete("auth-token")
@@ -14,4 +15,4 @@ export async function POST() {
       { status: 500 }
     )
   }
-}
+})

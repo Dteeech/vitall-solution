@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { SignJWT } from "jose"
 import { cookies } from "next/headers"
+import { withMetrics } from "@/lib/withMetrics"
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || "votre-secret-super-securise-changez-moi"
@@ -13,7 +14,7 @@ type AutoLoginRequest = {
   organizationId: string
 }
 
-export async function POST(request: Request) {
+export const POST = withMetrics(async function POST(request: Request) {
   try {
     const { userId, email, role, organizationId }: AutoLoginRequest = await request.json()
 
@@ -49,4 +50,4 @@ export async function POST(request: Request) {
       { status: 500 }
     )
   }
-}
+})

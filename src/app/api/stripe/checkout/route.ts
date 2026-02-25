@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import Stripe from "stripe"
+import { withMetrics } from "@/lib/withMetrics"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2026-01-28.clover",
@@ -15,7 +16,7 @@ type CheckoutRequest = {
   totalPrice: number
 }
 
-export async function POST(request: Request) {
+export const POST = withMetrics(async function POST(request: Request) {
   try {
     const body: CheckoutRequest = await request.json()
 
@@ -74,4 +75,4 @@ export async function POST(request: Request) {
       { status: 500 }
     )
   }
-}
+})

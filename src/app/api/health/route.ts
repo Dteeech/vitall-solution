@@ -1,19 +1,13 @@
 import { NextResponse } from 'next/server';
-import { recordHttpRequest, recordHttpDuration } from '@/lib/metrics';
+import { withMetrics } from '@/lib/withMetrics';
 
 // Track application start time
 const appStartTime = Date.now();
 
-export async function GET() {
-  const start = Date.now();
+export const GET = withMetrics(async function GET() {
   const uptimeSeconds = Math.floor((Date.now() - appStartTime) / 1000);
   const memUsage = process.memoryUsage();
-  
-  // Record metrics for this request
-  const duration = (Date.now() - start) / 1000;
-  recordHttpRequest('GET', '/api/health', 200);
-  recordHttpDuration('GET', '/api/health', 200, duration);
-  
+
   return NextResponse.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
@@ -25,6 +19,6 @@ export async function GET() {
       external: memUsage.external,
     },
   });
-}
+});
 
 

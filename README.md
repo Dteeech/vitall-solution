@@ -4,15 +4,15 @@
 
 ---
 
-## � Sommaire
+## Sommaire
 
-1. [🚀 Documentation technique (Lancer le projet)](#-documentation-technique-lancer-le-projet)
-2. [🏗️ Architecture & Démarche DevSecOps](#️-architecture--démarche-devsecops)
-3. [🚢 Déploiement & Maintenance](#-déploiement--maintenance)
+1. [ Documentation technique (Lancer le projet)](#documentation-technique-lancer-le-projet)
+2. [ Architecture & Démarche DevSecOps](#architecture--démarche-devsecops)
+3. [ Déploiement & Maintenance](#déploiement--maintenance)
 
 ---
 
-## �🚀 Documentation technique (Lancer le projet)
+## Documentation technique (Lancer le projet)
 
 ### Installation Locale (sans Docker)
 
@@ -35,7 +35,7 @@ docker compose up -d
 
 ---
 
-## 🏗️ Architecture & Démarche DevSecOps
+## Architecture & Démarche DevSecOps
 
 ### Philosophie du Projet
 
@@ -58,7 +58,7 @@ Notre approche repose sur la philosophie **DevSecOps** : la sécurité n'est pas
 
 ---
 
-## 🚢 Déploiement & Maintenance
+## Déploiement & Maintenance
 
 ### Pipeline Pipeline CI/CD
 
@@ -86,7 +86,7 @@ L'état de santé est surveillé via la stack **Prometheus / Grafana / Loki** :
 - [x] **Rollback Procédure** : Commande prête pour retour arrière en < 30s.
 - [x] **Secret Management** : Variables d'environnement injectées dynamiquement.
 
-### 🔄 Procédure de Rollback
+### Procédure de Rollback
 
 Si la production échoue :
 1. **Via GitHub Actions** : Ré-exécuter le dernier job réussi.

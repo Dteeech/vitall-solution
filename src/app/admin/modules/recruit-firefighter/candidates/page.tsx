@@ -13,17 +13,7 @@ import {
   useDroppable,
   useDraggable,
 } from "@dnd-kit/core"
-
-type Candidate = {
-  id: number
-  name: string
-  status: "Nouvelle" | "Test sportif" | "Visite médicale"
-  date: string
-  location: string
-  documents: number
-  comments?: number
-  description?: string
-}
+import type { Candidate } from "@/modules/recrutement/types"
 
 const initialCandidates: Candidate[] = [
   { id: 1, name: "Martin Léo", status: "Nouvelle", date: "05/12/2025", location: "Saint-Herblain", documents: 12, comments: 0, description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore." },

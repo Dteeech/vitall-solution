@@ -13,22 +13,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-
-type ActivityType = "interventions" | "formation" | "entretien" | "astreinte"
-
-type Activity = {
-  id: string
-  type: ActivityType
-  label: string
-  collaborator?: string
-  time?: string
-}
-
-type CalendarDay = {
-  date: number
-  isCurrentMonth: boolean
-  activities: Activity[]
-}
+import type { ActivityType, CalendarDay } from "@/modules/planning/types"
 
 const activityColors: Record<ActivityType, string> = {
   interventions: "bg-[#d3e1eb]",

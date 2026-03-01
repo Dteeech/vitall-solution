@@ -12,19 +12,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-
-type AstreinteAssignment = {
-  id: string
-  name: string
-  initials: string
-  colorClass: string
-}
-
-type CalendarDay = {
-  date: number
-  isCurrentMonth: boolean
-  assignment?: AstreinteAssignment
-}
+import type { AstreinteCalendarDay } from "@/modules/planning/types"
 
 export default function AstreintesPage() {
   const [isGlobalModalOpen, setIsGlobalModalOpen] = useState(false)
@@ -34,7 +22,7 @@ export default function AstreintesPage() {
   // Mock data for calendar
   const daysOfWeek = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"]
 
-  const calendarDays: CalendarDay[] = [
+  const calendarDays: AstreinteCalendarDay[] = [
     { date: 1, isCurrentMonth: false },
     { date: 2, isCurrentMonth: false },
     { date: 3, isCurrentMonth: true },
@@ -69,7 +57,7 @@ export default function AstreintesPage() {
     { date: 2, isCurrentMonth: false },
   ]
 
-  const handleDayClick = (day: CalendarDay) => {
+  const handleDayClick = (day: AstreinteCalendarDay) => {
     if (day.isCurrentMonth) {
       setSelectedDay(day.date)
       setIsDayModalOpen(true)

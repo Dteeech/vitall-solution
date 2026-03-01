@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,7 +7,115 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Enums
+model User {
+  id             String         @id @default(uuid())
+  email          String         @unique
+  password       String
+  firstName      String
+  lastName       String
+  role           UserRole       @default(USER)
+  organizationId String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  leaveRequests  LeaveRequest[]
+  shifts         Shift[]
+  organization   Organization?  @relation(fields: [organizationId], references: [id])
+}
+
+model Organization {
+  id           String        @id @default(uuid())
+  name         String
+  address      String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  candidatures Candidature[]
+  plannings    Planning[]
+  subscription Subscription?
+  users        User[]
+}
+
+model Module {
+  id                  String               @id @default(uuid())
+  name                String               @unique
+  category            String
+  price               Float
+  description         String?
+  isBasePackModule    Boolean              @default(false)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  subscriptionModules SubscriptionModule[]
+}
+
+model Subscription {
+  id                   String               @id @default(uuid())
+  organizationId       String               @unique
+  status               SubscriptionStatus   @default(PENDING)
+  startDate            DateTime             @default(now())
+  endDate              DateTime?
+  monthlyPrice         Float                @default(0)
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  organization         Organization         @relation(fields: [organizationId], references: [id])
+  subscriptionModules  SubscriptionModule[]
+}
+
+model SubscriptionModule {
+  id             String       @id @default(uuid())
+  subscriptionId String
+  moduleId       String
+  assignedAt     DateTime     @default(now())
+  module         Module       @relation(fields: [moduleId], references: [id])
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+
+  @@unique([subscriptionId, moduleId])
+}
+
+model Candidature {
+  id             String            @id @default(uuid())
+  firstName      String
+  lastName       String
+  email          String
+  phone          String?
+  cvUrl          String?
+  status         CandidatureStatus @default(PENDING)
+  organizationId String
+  appliedAt      DateTime          @default(now())
+  organization   Organization      @relation(fields: [organizationId], references: [id])
+}
+
+model Planning {
+  id             String       @id @default(uuid())
+  name           String
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  shifts         Shift[]
+}
+
+model Shift {
+  id          String    @id @default(uuid())
+  planningId  String
+  userId      String?
+  startTime   DateTime
+  endTime     DateTime
+  type        ShiftType
+  isAvailable Boolean   @default(true)
+  planning    Planning  @relation(fields: [planningId], references: [id])
+  user        User?     @relation(fields: [userId], references: [id])
+}
+
+model LeaveRequest {
+  id         String      @id @default(uuid())
+  userId     String
+  startDate  DateTime
+  endDate    DateTime
+  reason     String?
+  status     LeaveStatus @default(PENDING)
+  approvedBy String?
+  user       User        @relation(fields: [userId], references: [id])
+}
+
 enum UserRole {
   ADMIN
   USER
@@ -41,116 +146,4 @@ enum LeaveStatus {
   PENDING
   APPROVED
   REJECTED
-}
-
-// Models
-model User {
-  id             String         @id @default(uuid())
-  email          String         @unique
-  password       String // Hashed password
-  firstName      String
-  lastName       String
-  role           UserRole  @default(USER)
-  organization   Organization? @relation(fields: [organizationId], references: [id])
-  organizationId String?
-  shifts         Shift[]
-  leaveRequests  LeaveRequest[]
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-}
-
-model Organization {
-  id                  String               @id @default(uuid())
-  name                String
-  address             String?
-  users               User[]
-  subscription        Subscription?
-  candidatures        Candidature[]
-  plannings           Planning[]
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-}
-
-model Module {
-  id                  String               @id @default(uuid())
-  name                String               @unique
-  category            String
-  price               Float
-  description         String?
-  isBasePackModule    Boolean              @default(false)
-  subscriptionModules SubscriptionModule[]
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-}
-
-model Subscription {
-  id                 String               @id @default(uuid())
-  organization       Organization         @relation(fields: [organizationId], references: [id])
-  organizationId     String               @unique
-  status             SubscriptionStatus   @default(PENDING)
-  startDate          DateTime             @default(now())
-  endDate            DateTime?
-  monthlyPrice       Float                @default(0)
-  subscriptionModules SubscriptionModule[]
-  stripeCustomerId   String?
-  stripeSubscriptionId String?
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
-}
-
-model SubscriptionModule {
-  id             String     @id @default(uuid())
-  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
-  subscriptionId String
-  module         Module     @relation(fields: [moduleId], references: [id])
-  moduleId       String
-  assignedAt     DateTime   @default(now())
-
-  @@unique([subscriptionId, moduleId]) // Ensures a module can only be assigned once per subscription
-}
-
-// --- NOUVEAUX MODELS ---
-
-model Candidature {
-  id              String   @id @default(uuid())
-  firstName       String
-  lastName        String
-  email           String
-  phone           String?
-  cvUrl           String?  // Lien vers le CV stocké
-  status          CandidatureStatus @default(PENDING) // PENDING, ACCEPTED, REJECTED, INTERVIEW
-  organization    Organization @relation(fields: [organizationId], references: [id])
-  organizationId  String
-  appliedAt       DateTime @default(now())
-}
-
-model Planning {
-  id              String   @id @default(uuid())
-  name            String   // Ex: "Planning Semaine 12" ou "Equipe A"
-  organization    Organization @relation(fields: [organizationId], references: [id])
-  organizationId  String
-  shifts          Shift[]
-}
-
-model Shift {
-  id              String   @id @default(uuid())
-  planning        Planning @relation(fields: [planningId], references: [id])
-  planningId      String
-  user            User?    @relation(fields: [userId], references: [id]) // Peut être null si créneau ouvert
-  userId          String?
-  startTime       DateTime
-  endTime         DateTime
-  type            ShiftType // GARDE, ASTREINTE, FORMATION
-  isAvailable     Boolean  @default(true) // Créneau ouvert à la réservation ?
-}
-
-model LeaveRequest {
-  id              String   @id @default(uuid())
-  user            User     @relation(fields: [userId], references: [id])
-  userId          String
-  startDate       DateTime
-  endDate         DateTime
-  reason          String?
-  status          LeaveStatus @default(PENDING) // PENDING, APPROVED, REJECTED
-  approvedBy      String?  // ID du manager qui a validé
 }

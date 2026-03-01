@@ -43,23 +43,23 @@ async function main() {
   // Créer une organisation de test
   const organizationAdmin = await prisma.organization.upsert({
     where: { id: 'org-admin-id' },
-    update: {},
+    update: { name: 'Organisation Admin test', address: '4 chemin de la Chatterie, 44100 Saint-Herblain' },
     create: {
       name: 'Organisation Admin test',
       address: '4 chemin de la Chatterie, 44100 Saint-Herblain',
     },
   });
-  console.log(`Upserted organization: ${organizationAdmin.name}`);
+  console.log(`Upserted organization: ${organizationAdmin.name} (id: ${organizationAdmin.id})`);
 
   const organizationUser = await prisma.organization.upsert({
     where: { id: 'org-user-id' },
-    update: {},
+    update: { name: 'Organisation de USER test', address: '4 chemin de la Chatterie, 44100 Saint-Herblain' },
     create: {
       name: 'Organisation de USER test',
       address: '4 chemin de la Chatterie, 44100 Saint-Herblain',
     },
   });
-  console.log(`Upserted organization: ${organizationUser.name}`);
+  console.log(`Upserted organization: ${organizationUser.name} (id: ${organizationUser.id})`);
   
   // Hash des mots de passe depuis les variables d'environnement
   const adminPassword = process.env.SEED_ADMIN_PASSWORD || 'ChangeMeInProduction!';
@@ -68,10 +68,15 @@ async function main() {
   const hashedAdminPassword = await bcrypt.hash(adminPassword, 10);
   const hashedUserPassword = await bcrypt.hash(userPassword, 10);
 
-  // Création Admin
+  // Création Admin — update inclut organizationId pour rattraper les users existants
   const admin = await prisma.user.upsert({
     where: { email: 'admin@test.fr' },
-    update: {},
+    update: {
+      organizationId: organizationAdmin.id,
+      role: 'ADMIN',
+      firstName: 'Admin',
+      lastName: 'Vitall',
+    },
     create: {
       email: 'admin@test.fr',
       password: hashedAdminPassword,
@@ -81,12 +86,17 @@ async function main() {
       organizationId: organizationAdmin.id,
     },
   });
-  console.log(`Upserted admin user: ${admin.email}`);
+  console.log(`Upserted admin user: ${admin.email} (orgId: ${admin.organizationId})`);
 
   // Création User Standard
   const user = await prisma.user.upsert({
     where: { email: 'user@test.fr' },
-    update: {},
+    update: {
+      organizationId: organizationUser.id,
+      role: 'USER',
+      firstName: 'User',
+      lastName: 'Vitall',
+    },
     create: {
       email: 'user@test.fr',
       password: hashedUserPassword,
@@ -96,7 +106,58 @@ async function main() {
       organizationId: organizationUser.id,
     },
   });
-  console.log(`Upserted standard user: ${user.email}`);
+  console.log(`Upserted standard user: ${user.email} (orgId: ${user.organizationId})`);
+
+  // Créer la subscription pour l'organisation Admin
+  const subscription = await prisma.subscription.upsert({
+    where: { organizationId: organizationAdmin.id },
+    update: { status: 'ACTIVE' },
+    create: {
+      organizationId: organizationAdmin.id,
+      status: 'ACTIVE',
+      startDate: new Date(),
+      monthlyPrice: 270.0,
+    },
+  });
+  console.log(`Upserted subscription: ${subscription.id} (org: ${organizationAdmin.name})`);
+
+  // Activer le module Planning par défaut pour l'admin
+  const planningModule = await prisma.module.findUnique({ where: { name: 'Planning' } });
+  const recrutementModule = await prisma.module.findUnique({ where: { name: 'Recrutement' } });
+
+  if (planningModule) {
+    await prisma.subscriptionModule.upsert({
+      where: {
+        subscriptionId_moduleId: {
+          subscriptionId: subscription.id,
+          moduleId: planningModule.id,
+        },
+      },
+      update: {},
+      create: {
+        subscriptionId: subscription.id,
+        moduleId: planningModule.id,
+      },
+    });
+    console.log(`Activated module: Planning`);
+  }
+
+  if (recrutementModule) {
+    await prisma.subscriptionModule.upsert({
+      where: {
+        subscriptionId_moduleId: {
+          subscriptionId: subscription.id,
+          moduleId: recrutementModule.id,
+        },
+      },
+      update: {},
+      create: {
+        subscriptionId: subscription.id,
+        moduleId: recrutementModule.id,
+      },
+    });
+    console.log(`Activated module: Recrutement`);
+  }
 
   console.log(`Seeding finished.`);
 }

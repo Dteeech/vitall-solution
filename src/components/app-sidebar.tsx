@@ -3,7 +3,6 @@
 import * as React from "react"
 import {
   LayoutDashboard,
-  Users,
   ChevronDown,
   ChevronRight,
   Bell,
@@ -15,6 +14,9 @@ import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import logoBlanc from "../../public/assets/images/Logo-Blanc-avec-texte.png"
+import { useAuth } from "@/context/AuthContext"
+import { NavUser } from "./nav-user"
+import { MODULE_REGISTRY, type ModuleDefinition } from "@/core/config/module-registry"
 
 import {
   Sidebar,
@@ -44,44 +46,35 @@ type MenuItem = {
   badge?: boolean
 }
 
-const MAIN_MENU_ITEMS: MenuItem[] = [
-  {
-    title: "Tableau de bord",
-    href: "/admin",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Recrutement",
-    iconSrc: "/assets/icons/recrutement.svg",
-    subItems: [
-      { title: "Candidatures", href: "/admin/modules/recruit-firefighter/candidates", isActive: true },
-      { title: "Casernes", href: "/admin/casernes" },
-      { title: "Transfert", href: "/admin/transfert" },
-      { title: "Ma caserne", href: "/admin/ma-caserne" },
-      { title: "Données analytiques", href: "/admin/analytics" },
-    ],
-  },
-  {
-    title: "Planning",
-    iconSrc: "/assets/icons/Planning.svg",
-    subItems: [
-      { title: "Planning", href: "/admin/planning" },
-      { title: "Astreintes", href: "/admin/planning/astreintes" },
-      { title: "Données analytiques", href: "/admin/planning/donnees-analytiques" },
-    ],
-  },
-  {
-    title: "Congés",
-    icon: Users,
-    subItems: [
-      { title: "sous menu", href: "/" },
-      { title: "sous menu", href: "/" },
-      { title: "sous menu", href: "/" },
-      { title: "sous menu", href: "/" },
-      { title: "sous menu", href: "/" },
-    ],
-  },
-]
+/** Entrée statique toujours visible */
+const DASHBOARD_ITEM: MenuItem = {
+  title: "Tableau de bord",
+  href: "/admin",
+  icon: LayoutDashboard,
+}
+
+/** Construit un MenuItem depuis une ModuleDefinition du registre */
+function buildMenuItemFromModule(mod: ModuleDefinition): MenuItem {
+  const subItems: SubMenuItem[] = mod.adminRoutes.map((r) => ({
+    title: r.title,
+    href: r.href,
+  }))
+
+  // Si un seul sous-item, en faire un lien direct
+  if (subItems.length === 1) {
+    return {
+      title: mod.displayName,
+      href: subItems[0].href,
+      iconSrc: mod.icon,
+    }
+  }
+
+  return {
+    title: mod.displayName,
+    iconSrc: mod.icon,
+    subItems: subItems.length > 0 ? subItems : undefined,
+  }
+}
 
 const FOOTER_MENU_ITEMS: MenuItem[] = [
   {
@@ -104,21 +97,62 @@ const FOOTER_MENU_ITEMS: MenuItem[] = [
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
-  const [openMenus, setOpenMenus] = React.useState<Record<string, boolean>>(() => {
+  const { user } = useAuth()
+  const [activeModules, setActiveModules] = React.useState<string[]>([])
+  const [openMenus, setOpenMenus] = React.useState<Record<string, boolean>>({})
+
+  // Charger les modules actifs depuis l'API
+  React.useEffect(() => {
+    const fetchModules = async () => {
+      try {
+        const response = await fetch("/api/user/modules")
+        if (response.ok) {
+          const data = await response.json()
+          setActiveModules(data.modules.map((m: { name: string }) => m.name))
+        }
+      } catch (error) {
+        console.error("Sidebar modules fetch error:", error)
+      }
+    }
+    fetchModules()
+  }, [user])
+
+  // Construire dynamiquement le menu depuis le MODULE_REGISTRY, filtré par modules actifs
+  const menuItems = React.useMemo(() => {
+    const moduleMenuItems = activeModules
+      .map((name) => MODULE_REGISTRY[name])
+      .filter((mod): mod is ModuleDefinition => !!mod)
+      .map(buildMenuItemFromModule)
+
+    return [DASHBOARD_ITEM, ...moduleMenuItems]
+  }, [activeModules])
+
+  // Initialiser les menus ouverts selon l'URL
+  React.useEffect(() => {
     const initial: Record<string, boolean> = {}
-    MAIN_MENU_ITEMS.forEach((item) => {
+    menuItems.forEach((item) => {
       if (item.subItems && item.subItems.length > 0) {
         const hasActive = item.subItems.some(
           (sub) => pathname === sub.href || pathname.startsWith(`${sub.href}/`)
         )
-        initial[item.title] = hasActive
+        if (hasActive) initial[item.title] = true
       }
     })
-    return initial
-  })
+    setOpenMenus(prev => ({ ...prev, ...initial }))
+  }, [menuItems, pathname])
 
   const toggleMenu = (title: string) => {
     setOpenMenus((prev) => ({ ...prev, [title]: !prev[title] }))
+  }
+
+  const sidebarUserData = user ? {
+    name: `${user.firstName} ${user.lastName}`,
+    email: user.email,
+    avatar: "/assets/images/user-placeholder.png"
+  } : {
+    name: "Utilisateur",
+    email: "chargement...",
+    avatar: ""
   }
 
   return (
@@ -150,7 +184,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
       <SidebarContent className="px-4 group-data-[state=collapsed]:px-2">
         <SidebarMenu className="group-data-[state=collapsed]:items-center">
-          {MAIN_MENU_ITEMS.map((item) => (
+          {menuItems.map((item) => (
             <SidebarMenuItem
               key={item.title}
               className="group-data-[state=collapsed]:flex group-data-[state=collapsed]:justify-center"
@@ -256,6 +290,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
+          <NavUser user={sidebarUserData} />
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>

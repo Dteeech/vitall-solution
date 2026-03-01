@@ -9,6 +9,7 @@ import {
   User,
   Settings,
   LucideIcon,
+  LayoutGrid,
 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
@@ -78,15 +79,15 @@ function buildMenuItemFromModule(mod: ModuleDefinition): MenuItem {
 
 const FOOTER_MENU_ITEMS: MenuItem[] = [
   {
+    title: "Modules",
+    href: "/admin/modules",
+    icon: LayoutGrid,
+  },
+  {
     title: "Notification",
     href: "/admin/notifications",
     icon: Bell,
     badge: true,
-  },
-  {
-    title: "Profil",
-    href: "/admin/profil",
-    icon: User,
   },
   {
     title: "Paramètres",

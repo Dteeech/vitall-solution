@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -13,8 +13,39 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
+import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, format, isSameMonth, isSameDay, addMonths, subMonths, getDay, parseISO } from "date-fns"
+import { fr } from "date-fns/locale"
 
-type ActivityType = "interventions" | "formation" | "entretien" | "astreinte"
+// Types pour l'API
+type ShiftTypeAPI = "GARDE" | "ASTREINTE" | "FORMATION" | "REUNION"
+
+interface ShiftAPI {
+  id: string
+  startTime: string // ISO date string
+  endTime: string   // ISO date string
+  type: ShiftTypeAPI
+  user?: {
+      id: string
+      firstName: string
+      lastName: string
+  }
+}
+
+interface UserAPI {
+    id: string
+    firstName: string
+    lastName: string
+    email: string
+}
+
+interface PlanningAPI {
+    id: string
+    name: string
+    shifts: ShiftAPI[]
+}
+
+// Types pour l'UI
+type ActivityType = "interventions" | "formation" | "entretien" | "astreinte" | "reunion"
 
 type Activity = {
   id: string
@@ -25,103 +56,323 @@ type Activity = {
 }
 
 type CalendarDay = {
-  date: number
+  date: Date
   isCurrentMonth: boolean
   activities: Activity[]
 }
 
 const activityColors: Record<ActivityType, string> = {
-  interventions: "bg-[#d3e1eb]",
-  formation: "bg-[#f1f1f1]",
-  entretien: "bg-[#ffe3cf]",
-  astreinte: "bg-[#b8cdd9]",
+  interventions: "bg-[#e3f2fd] border-l-4 border-[#1565c0]", // Bleu materiel
+  formation: "bg-[#f3e5f5] border-l-4 border-[#7b1fa2]",     // Violet
+  entretien: "bg-[#fff3e0] border-l-4 border-[#ef6c00]",     // Orange
+  astreinte: "bg-[#e8f5e9] border-l-4 border-[#2e7d32]",    // Vert
+  reunion: "bg-[#f5f5f5] border-l-4 border-[#616161]"       // Gris
 }
 
 const activityLabels: Record<ActivityType, string> = {
-  interventions: "Interventions",
+  interventions: "Garde",
   formation: "Formation",
   entretien: "Entretien",
   astreinte: "Astreinte",
+  reunion: "Réunion"
 }
 
-function ActivityTag({ type }: { type: ActivityType }) {
+// Mapping API type -> UI type
+const mapShiftTypeToActivityType = (type: ShiftTypeAPI): ActivityType => {
+    switch (type) {
+        case 'GARDE': return 'interventions';
+        case 'ASTREINTE': return 'astreinte';
+        case 'FORMATION': return 'formation';
+        case 'REUNION': return 'reunion';
+        default: return 'interventions';
+    }
+}
+
+const mapActivityTypeToShiftType = (type: ActivityType): ShiftTypeAPI => {
+    switch (type) {
+        case 'interventions': return 'GARDE';
+        case 'astreinte': return 'ASTREINTE';
+        case 'formation': return 'FORMATION';
+        case 'reunion': return 'REUNION';
+        default: return 'GARDE';
+    }
+}
+
+
+function ActivityTag({ type, label, time, onClick }: { type: ActivityType, label: string, time?: string, onClick?: (e: React.MouseEvent) => void }) {
   return (
-    <div className={`${activityColors[type]} px-1 py-1 rounded text-xs font-medium text-[#131315] tracking-[0.12px] text-center`}>
-      {activityLabels[type]}
+    <div 
+        onClick={onClick}
+        className={`${activityColors[type]} px-2 py-1.5 rounded-r-md text-xs font-medium text-[#131315] tracking-[0.12px] text-left overflow-hidden cursor-pointer hover:opacity-90 transition-opacity flex flex-col gap-0.5 shadow-sm`}
+        title={`${activityLabels[type]} - ${label} (${time})`}
+    >
+      <div className="flex justify-between items-center w-full">
+         <span className="font-bold uppercase text-[9px] opacity-70 leading-none truncate">{activityLabels[type]}</span>
+         {time && <span className="text-[9px] opacity-60 leading-none whitespace-nowrap ml-1">{time}</span>}
+      </div>
+      <span className="truncate leading-tight font-medium">{label}</span>
     </div>
   )
 }
 
 export default function PlanningPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedDay, setSelectedDay] = useState<number | null>(null)
+  const [selectedDay, setSelectedDay] = useState<Date | null>(null)
   const [specifyTime, setSpecifyTime] = useState(false)
+  const [currentDate, setCurrentDate] = useState(new Date())
+  
+  const [shifts, setShifts] = useState<ShiftAPI[]>([])
+  const [users, setUsers] = useState<UserAPI[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Form states
+  const [selectedActivity, setSelectedActivity] = useState<ActivityType>('interventions')
+  const [selectedUserId, setSelectedUserId] = useState<string>('')
+  const [startTime, setStartTime] = useState("09:00")
+  const [endTime, setEndTime] = useState("17:00")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [endDate, setEndDate] = useState<string>("") // Pour plage de dates
+
+  // Filter states
+  const [selectedCollaboratorFilter, setSelectedCollaboratorFilter] = useState<string>('')
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [editingShift, setEditingShift] = useState<ShiftAPI | null>(null)
+  
+  // États pour le formulaire d'édition
+  const [editActivity, setEditActivity] = useState<ActivityType>('interventions')
+  const [editUserId, setEditUserId] = useState<string>('')
+  const [editStartTime, setEditStartTime] = useState("09:00")
+  const [editEndTime, setEditEndTime] = useState("17:00")
+  const [editDate, setEditDate] = useState<string>("")
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const daysOfWeek = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"]
 
-  // Mock calendar data - jour 9 a 3 activités comme dans le design
-  const calendarDays: CalendarDay[] = [
-    // Semaine 1
-    { date: 29, isCurrentMonth: false, activities: [] },
-    { date: 30, isCurrentMonth: false, activities: [] },
-    { date: 1, isCurrentMonth: true, activities: [] },
-    { date: 2, isCurrentMonth: true, activities: [] },
-    { date: 3, isCurrentMonth: true, activities: [] },
-    { date: 4, isCurrentMonth: true, activities: [] },
-    { date: 5, isCurrentMonth: true, activities: [] },
-    // Semaine 2
-    { date: 6, isCurrentMonth: true, activities: [] },
-    { date: 7, isCurrentMonth: true, activities: [] },
-    { date: 8, isCurrentMonth: true, activities: [] },
-    {
-      date: 9,
-      isCurrentMonth: true,
-      activities: [
-        { id: "1", type: "interventions", label: "Interventions" },
-        { id: "2", type: "entretien", label: "Entretien" },
-        { id: "3", type: "formation", label: "Formation" },
-      ]
-    },
-    {
-      date: 10,
-      isCurrentMonth: true,
-      activities: [
-        { id: "4", type: "interventions", label: "Interventions" }
-      ]
-    },
-    { date: 11, isCurrentMonth: true, activities: [] },
-    { date: 12, isCurrentMonth: true, activities: [] },
-    // Semaine 3
-    { date: 13, isCurrentMonth: true, activities: [] },
-    { date: 14, isCurrentMonth: true, activities: [] },
-    { date: 15, isCurrentMonth: true, activities: [] },
-    { date: 16, isCurrentMonth: true, activities: [] },
-    { date: 17, isCurrentMonth: true, activities: [] },
-    { date: 18, isCurrentMonth: true, activities: [] },
-    { date: 19, isCurrentMonth: true, activities: [] },
-    // Semaine 4
-    { date: 20, isCurrentMonth: true, activities: [] },
-    { date: 21, isCurrentMonth: true, activities: [] },
-    { date: 22, isCurrentMonth: true, activities: [] },
-    { date: 23, isCurrentMonth: true, activities: [] },
-    { date: 24, isCurrentMonth: true, activities: [] },
-    { date: 25, isCurrentMonth: true, activities: [] },
-    { date: 26, isCurrentMonth: true, activities: [] },
-    // Semaine 5
-    { date: 27, isCurrentMonth: true, activities: [] },
-    { date: 28, isCurrentMonth: true, activities: [] },
-    { date: 29, isCurrentMonth: true, activities: [] },
-    { date: 30, isCurrentMonth: true, activities: [] },
-    { date: 31, isCurrentMonth: true, activities: [] },
-    { date: 1, isCurrentMonth: false, activities: [] },
-    { date: 2, isCurrentMonth: false, activities: [] },
-  ]
+  // Fetch planning data
+  const fetchPlanning = async () => {
+    setIsLoading(true);
+    try {
+        const startDate = startOfWeek(startOfMonth(currentDate), { weekStartsOn: 1 }).toISOString();
+        const endDate = endOfWeek(endOfMonth(currentDate), { weekStartsOn: 1 }).toISOString();
+
+        const res = await fetch(`/api/planning?start=${startDate}&end=${endDate}`);
+        if (res.ok) {
+            const data: PlanningAPI[] = await res.json();
+            // Aplatir tous les shifts de tous les plannings pour l'instant
+            const allShifts = data.flatMap(p => p.shifts);
+            setShifts(allShifts);
+        }
+    } catch (error) {
+        console.error("Failed to fetch planning", error);
+    } finally {
+        setIsLoading(false);
+    }
+}
+
+  useEffect(() => {
+    fetchPlanning();
+  }, [currentDate]);
+
+  // Fetch users
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const res = await fetch('/api/organization/users');
+                if (res.ok) {
+                    const data = await res.json();
+                    setUsers(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch users", error);
+            }
+        }
+        fetchUsers();
+    }, []);
+
+  // Generate calendar days
+  const calendarDays: CalendarDay[] = (() => {
+      const monthStart = startOfMonth(currentDate);
+      const monthEnd = endOfMonth(monthStart);
+      const startDate = startOfWeek(monthStart, { weekStartsOn: 1 });
+      const endDate = endOfWeek(monthEnd, { weekStartsOn: 1 });
+
+      const dayInterval = eachDayOfInterval({ start: startDate, end: endDate });
+
+      return dayInterval.map(day => {
+          // Find shifts for this day
+          let dayShifts = shifts.filter(s => isSameDay(parseISO(s.startTime), day));
+
+          // Apply collaborator filter
+          if (selectedCollaboratorFilter) {
+               // Filtrer les shifts assignés au collaborateur sélectionné
+               dayShifts = dayShifts.filter(s => s.user?.id === selectedCollaboratorFilter);
+          }
+
+          const activities: Activity[] = dayShifts.map(s => ({
+              id: s.id,
+              type: mapShiftTypeToActivityType(s.type),
+              label: s.user ? `${s.user.firstName} ${s.user.lastName}` : 'Dispo', // Affiche le nom ou "Dispo"
+              collaborator: s.user ? `${s.user.firstName} ${s.user.lastName}` : undefined,
+              time: `${format(parseISO(s.startTime), 'HH:mm')} - ${format(parseISO(s.endTime), 'HH:mm')}`
+          }));
+
+          return {
+              date: day,
+              isCurrentMonth: isSameMonth(day, monthStart),
+              activities
+          };
+      });
+  })();
 
   const handleDayClick = (day: CalendarDay) => {
+    // Permettre de cliquer même hors mois courant pour naviguer ? Non, restons sur le design
     if (day.isCurrentMonth) {
       setSelectedDay(day.date)
+      // Par défaut, date fin = date début
+      setEndDate(format(day.date, 'yyyy-MM-dd'))
       setIsModalOpen(true)
     }
+  }
+
+  const handlePrevMonth = () => setCurrentDate(subMonths(currentDate, 1));
+  const handleNextMonth = () => setCurrentDate(addMonths(currentDate, 1));
+
+  const handleShiftClick = (shift: ShiftAPI) => {
+      setEditingShift(shift);
+      setEditActivity(mapShiftTypeToActivityType(shift.type));
+      setEditUserId(shift.user?.id || "");
+      setEditDate(format(parseISO(shift.startTime), 'yyyy-MM-dd'));
+      setEditStartTime(format(parseISO(shift.startTime), 'HH:mm'));
+      setEditEndTime(format(parseISO(shift.endTime), 'HH:mm'));
+      setIsEditModalOpen(true);
+  }
+
+  const handleUpdateShift = async () => {
+      if (!editingShift) return;
+      setIsSubmitting(true);
+      try {
+          const startDateTime = parseISO(editDate);
+          const [startHour, startMinute] = editStartTime.split(':').map(Number);
+          startDateTime.setHours(startHour, startMinute);
+
+          const endDateTime = parseISO(editDate);
+          const [endHour, endMinute] = editEndTime.split(':').map(Number);
+          endDateTime.setHours(endHour, endMinute);
+
+          if (endDateTime < startDateTime) {
+             endDateTime.setDate(endDateTime.getDate() + 1);
+          }
+
+          const payload = {
+              id: editingShift.id,
+              startTime: startDateTime.toISOString(),
+              endTime: endDateTime.toISOString(),
+              type: mapActivityTypeToShiftType(editActivity),
+              userId: editUserId || undefined
+          };
+
+          const res = await fetch('/api/planning', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+          });
+
+          if (res.ok) {
+              setIsEditModalOpen(false);
+              fetchPlanning();
+          }
+      } catch (error) {
+          console.error("Error updating shift", error);
+      } finally {
+          setIsSubmitting(false);
+      }
+  }
+
+  const handleDeleteShift = async () => {
+      if (!editingShift) return;
+      if (!confirm("Voulez-vous vraiment supprimer cette activité ?")) return;
+
+      setIsDeleting(true);
+      try {
+          const res = await fetch(`/api/planning?id=${editingShift.id}`, {
+              method: 'DELETE'
+          });
+
+          if (res.ok) {
+              setIsEditModalOpen(false);
+              fetchPlanning();
+          }
+      } catch (error) {
+          console.error("Error deleting shift", error);
+      } finally {
+          setIsDeleting(false);
+      }
+  }
+  
+  const handleCreateShift = async () => {
+      if (!selectedDay) return;
+
+      setIsSubmitting(true);
+      try {
+          const startDateTime = new Date(selectedDay);
+          
+          let endDateObj: Date;
+          if (endDate) {
+              endDateObj = parseISO(endDate);
+          } else {
+              endDateObj = new Date(selectedDay);
+          }
+
+          // Générer un tableau de jours entre start et end
+          const daysToCreate = eachDayOfInterval({ 
+            start: selectedDay, 
+            end: endDateObj 
+          });
+
+          // Créer un shift pour CHAQUE jour de l'intervalle
+          const createPromises = daysToCreate.map(day => {
+                const currentStart = new Date(day);
+                const [startHour, startMinute] = startTime.split(':').map(Number);
+                currentStart.setHours(startHour, startMinute);
+    
+                const currentEnd = new Date(day);
+                const [endHour, endMinute] = endTime.split(':').map(Number);
+                currentEnd.setHours(endHour, endMinute);
+                
+                // Si l'heure de fin est inférieure à l'heure de début (ex: nuit), on ajoute 1 jour
+                if (currentEnd < currentStart) {
+                    currentEnd.setDate(currentEnd.getDate() + 1);
+                }
+
+                const payload = {
+                    startTime: currentStart.toISOString(),
+                    endTime: currentEnd.toISOString(),
+                    type: mapActivityTypeToShiftType(selectedActivity),
+                    userId: selectedUserId || undefined // undefined si vide
+                };
+    
+                return fetch('/api/planning', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+          });
+
+          await Promise.all(createPromises);
+
+          setIsModalOpen(false);
+          fetchPlanning(); // Refresh planning
+          
+          // Reset relevant fields
+          setSelectedUserId('');
+          setSelectedActivity('interventions');
+
+      } catch (error) {
+          console.error("Error creating shift", error);
+      } finally {
+          setIsSubmitting(false);
+      }
   }
 
   return (
@@ -136,42 +387,53 @@ export default function PlanningPage() {
       {/* Planning Header with filters */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h2 className="text-xl font-semibold text-[#131315]">
-          Équipe de Martin Delcourt
+          Vue d&apos;ensemble
         </h2>
 
         <div className="flex flex-wrap gap-4">
           {/* Month Navigation */}
-          <div className="flex items-center gap-0">
+          <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="icon"
               className="h-10 w-10"
+              onClick={handlePrevMonth}
             >
               <ChevronLeft className="h-5 w-5 text-[#132e49]" />
             </Button>
 
-            <div className="w-[250px] flex items-center gap-2 px-4 py-2 border border-[#f1f1f1] rounded-lg bg-white h-10">
-              <span className="text-base text-[#465b5e] font-normal">
-                Octobre 2025
+            <div className="min-w-[200px] flex items-center justify-center gap-2 px-4 py-2 border border-[#f1f1f1] rounded-lg bg-white h-10">
+              <span className="text-base text-[#465b5e] font-normal capitalize">
+                {format(currentDate, 'MMMM yyyy', { locale: fr })}
               </span>
-              <CalendarIcon className="h-6 w-6 ml-auto text-[#131315]" />
+              <CalendarIcon className="h-5 w-5 ml-auto text-[#131315]" />
             </div>
 
             <Button
               variant="ghost"
               size="icon"
               className="h-10 w-10"
+              onClick={handleNextMonth}
             >
               <ChevronRight className="h-5 w-5 text-[#132e49]" />
             </Button>
           </div>
 
-          {/* Collaborator Select */}
-          <div className="w-[250px] flex items-center gap-2 px-4 py-2 border border-[#f1f1f1] rounded-lg bg-white h-10">
-            <span className="text-sm text-[#969390] tracking-[0.14px]">
-              Olivier Poluchon
-            </span>
-            <ChevronDown className="h-6 w-6 ml-auto text-[#131315]" />
+          {/* Collaborator Select Filter */}
+          <div className="w-[250px] relative">
+             <select
+                 className="w-full appearance-none px-4 py-2 border border-[#f1f1f1] rounded-lg bg-white h-10 text-sm text-[#969390] tracking-[0.14px] focus:outline-none focus:ring-2 focus:ring-[#ea8b49]"
+                 value={selectedCollaboratorFilter}
+                 onChange={(e) => setSelectedCollaboratorFilter(e.target.value)}
+             >
+                 <option value="">Tous les collaborateurs</option>
+                 {users.map(user => (
+                     <option key={user.id} value={user.id}>
+                         {user.firstName} {user.lastName}
+                     </option>
+                 ))}
+             </select>
+             <ChevronDown className="h-6 w-6 absolute right-2 top-2 pointer-events-none text-[#131315]" />
           </div>
 
           {/* View Type Select */}
@@ -185,50 +447,65 @@ export default function PlanningPage() {
       </div>
 
       {/* Calendar */}
-      <div className="rounded-2xl shadow-[0px_1px_1px_0px_rgba(0,0,0,0.12)] border border-[#f1f1f1] overflow-hidden">
+      <div className="rounded-2xl shadow-[0px_1px_1px_0px_rgba(0,0,0,0.12)] border border-[#f1f1f1] overflow-hidden bg-white">
         {/* Calendar Header */}
-        <div className="grid grid-cols-7 bg-white">
+        <div className="grid grid-cols-7 border-b border-[#f1f1f1]">
           {daysOfWeek.map((day, index) => (
             <div
               key={day}
               className={`
-                p-2 border border-[#f1f1f1] h-12 flex items-start
-                ${index === 0 ? "rounded-tl-2xl" : ""}
-                ${index === 6 ? "rounded-tr-2xl" : ""}
+                p-2 h-12 flex items-center justify-center
+                border-r border-[#f1f1f1] last:border-r-0
               `}
             >
-              <span className="text-[#969390] text-base">{day}</span>
+              <span className="text-[#969390] text-base font-medium">{day}</span>
             </div>
           ))}
         </div>
 
         {/* Calendar Days */}
-        <div className="grid grid-cols-7">
-          {calendarDays.map((day, index) => (
-            <div
-              key={index}
-              onClick={() => handleDayClick(day)}
-              className={`
-                min-h-[153px] p-4 border border-[#f1f1f1] flex flex-col justify-between
-                ${day.isCurrentMonth ? "bg-white cursor-pointer hover:bg-gray-50" : "bg-[#f4f4f4]"}
-                ${!day.isCurrentMonth ? "opacity-40" : ""}
-                ${index === calendarDays.length - 7 ? "rounded-bl-2xl" : ""}
-                ${index === calendarDays.length - 1 ? "rounded-br-2xl" : ""}
-              `}
-            >
-              <span className="text-[21px] font-medium text-[#131315] tracking-[0.21px]">
-                {day.date}
-              </span>
+        <div className="grid grid-cols-7 auto-rows-fr">
+           {isLoading ? (
+               <div className="col-span-7 flex justify-center items-center h-64">
+                   Chargement...
+               </div>
+           ) : (
+             calendarDays.map((day, index) => (
+                <div
+                key={day.date.toISOString()}
+                onClick={() => handleDayClick(day)}
+                className={`
+                    min-h-[140px] p-2 border-b border-r border-[#f1f1f1] flex flex-col gap-1 transition-colors
+                    ${(index + 1) % 7 === 0 ? "border-r-0" : ""}
+                    ${day.isCurrentMonth ? "bg-white cursor-pointer hover:bg-gray-50" : "bg-[#f9f9f9] text-gray-400"}
+                `}
+                >
+                <span className={`
+                    text-sm font-medium w-7 h-7 flex items-center justify-center rounded-full
+                    ${isSameDay(day.date, new Date()) ? "bg-[#ea8b49] text-white" : "text-[#131315]"}
+                `}>
+                    {format(day.date, 'd')}
+                </span>
 
-              {day.activities.length > 0 && (
-                <div className="flex flex-col gap-2 mt-2">
-                  {day.activities.map((activity) => (
-                    <ActivityTag key={activity.id} type={activity.type} />
-                  ))}
+                <div className="flex flex-col gap-1 mt-1 overflow-y-auto max-h-[100px] scrollbar-hide">
+                    {day.activities.map((activity) => (
+                    <ActivityTag 
+                        key={activity.id} 
+                        type={activity.type} 
+                        label={activity.label} 
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            // Trouver le shift correspondant
+                            const shift = shifts.find(s => s.id === activity.id);
+                            if (shift) handleShiftClick(shift);
+                        }}
+                        time={activity.time}
+                    />
+                    ))}
                 </div>
-              )}
-            </div>
-          ))}
+                </div>
+            ))
+           )}
         </div>
       </div>
 
@@ -247,25 +524,50 @@ export default function PlanningPage() {
               <Label className="text-xs text-[#131315] tracking-[0.12px]">
                 Activité <span className="text-[#d63737]">*</span>
               </Label>
-              <div className="flex items-center gap-2 px-4 py-2 border border-[#969390] rounded-lg bg-white h-10">
-                <span className="text-sm text-[#969390] tracking-[0.14px]">
-                  [Activité]
-                </span>
-                <ChevronDown className="h-6 w-6 ml-auto text-[#969390]" />
+              <div className="relative">
+                <select
+                    className="w-full appearance-none px-4 py-2 border border-[#969390] rounded-lg bg-white h-10 text-sm text-[#969390] tracking-[0.14px] focus:outline-none focus:ring-2 focus:ring-[#ea8b49]"
+                    value={selectedActivity}
+                    onChange={(e) => setSelectedActivity(e.target.value as ActivityType)}
+                >
+                    <option value="interventions">Garde</option>
+                    <option value="formation">Formation</option>
+                    <option value="entretien">Entretien</option>
+                    <option value="astreinte">Astreinte</option>
+                    <option value="reunion">Réunion</option>
+                </select>
+                <ChevronDown className="h-6 w-6 absolute right-2 top-2 pointer-events-none text-[#969390]" />
               </div>
             </div>
 
-            {/* Target Day */}
-            <div className="flex flex-col gap-2">
-              <Label className="text-xs text-[#131315] tracking-[0.12px]">
-                Journée cible <span className="text-[#d63737]">*</span>
-              </Label>
-              <div className="flex items-center gap-2 px-4 py-2 border border-[#f1f1f1] rounded-lg bg-white h-10">
-                <span className="text-sm text-[#969390] tracking-[0.14px]">
-                  {selectedDay ? `${selectedDay.toString().padStart(2, '0')}/01/2025` : "01/01/2025"}
-                </span>
-                <CalendarIcon className="h-6 w-6 ml-auto text-[#131315]" />
-              </div>
+            {/* Target Dates */}
+            <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2">
+                <Label className="text-xs text-[#131315] tracking-[0.12px]">
+                    Date début <span className="text-[#d63737]">*</span>
+                </Label>
+                <div className="flex items-center gap-2 px-4 py-2 border border-[#f1f1f1] rounded-lg bg-gray-50 h-10 cursor-not-allowed">
+                    <span className="text-sm text-[#969390] tracking-[0.14px]">
+                    {selectedDay ? format(selectedDay, 'dd/MM/yyyy') : ""}
+                    </span>
+                    <CalendarIcon className="h-4 w-4 ml-auto text-[#131315]" />
+                </div>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                <Label className="text-xs text-[#131315] tracking-[0.12px]">
+                    Date fin
+                </Label>
+                <div className="flex items-center gap-2 px-2 py-2 border border-[#969390] rounded-lg bg-white h-10">
+                    <Input 
+                        type="date"
+                        className="border-0 p-0 h-auto text-sm text-[#131315] focus-visible:ring-0"
+                        value={endDate}
+                        min={selectedDay ? format(selectedDay, 'yyyy-MM-dd') : undefined}
+                        onChange={(e) => setEndDate(e.target.value)}
+                    />
+                </div>
+                </div>
             </div>
 
             {/* Specify Time Checkbox */}
@@ -289,13 +591,15 @@ export default function PlanningPage() {
               <div className="flex items-center gap-4">
                 <Input
                   type="time"
-                  defaultValue="16:00"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
                   className="border-[#f1f1f1] h-10 text-sm text-[#969390] tracking-[0.14px]"
                 />
                 <span className="text-sm text-[#131315] tracking-[0.14px]">-</span>
                 <Input
                   type="time"
-                  defaultValue="17:00"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
                   className="border-[#f1f1f1] h-10 text-sm text-[#969390] tracking-[0.14px]"
                 />
               </div>
@@ -304,13 +608,22 @@ export default function PlanningPage() {
             {/* Collaborator */}
             <div className="flex flex-col gap-2">
               <Label className="text-xs text-[#131315] tracking-[0.12px]">
-                Collaborateur <span className="text-[#d63737]">*</span>
+                Collaborateur
               </Label>
-              <div className="flex items-center gap-2 px-4 py-2 border border-[#969390] rounded-lg bg-white h-10">
-                <span className="text-sm text-[#969390] tracking-[0.14px]">
-                  [Collaborateur]
-                </span>
-                <ChevronDown className="h-6 w-6 ml-auto text-[#969390]" />
+              <div className="relative">
+                 <select
+                    className="w-full appearance-none px-4 py-2 border border-[#969390] rounded-lg bg-white h-10 text-sm text-[#969390] tracking-[0.14px] focus:outline-none focus:ring-2 focus:ring-[#ea8b49]"
+                    value={selectedUserId}
+                    onChange={(e) => setSelectedUserId(e.target.value)}
+                >
+                    <option value="">Sélectionner un collaborateur (optionnel)</option>
+                    {users.map(user => (
+                        <option key={user.id} value={user.id}>
+                            {user.firstName} {user.lastName}
+                        </option>
+                    ))}
+                </select>
+                <ChevronDown className="h-6 w-6 absolute right-2 top-2 pointer-events-none text-[#969390]" />
               </div>
             </div>
           </div>
@@ -321,12 +634,103 @@ export default function PlanningPage() {
             <Button
               variant="outline"
               onClick={() => setIsModalOpen(false)}
-              className="text-[#ea8b49] border-[#ea8b49] hover:bg-[#ea8b49]/10"
+              className="border-[#ea8b49] text-[#ea8b49] hover:bg-[#ea8b49]/10"
             >
               Annuler
             </Button>
-            <Button className="bg-[#ea8b49] hover:bg-[#ea8b49]/90 text-white">
-              Valider
+            <Button 
+                className="bg-[#ea8b49] hover:bg-[#ea8b49]/90 text-white"
+                onClick={handleCreateShift}
+                disabled={isSubmitting}
+            >
+              {isSubmitting ? "Création..." : "Valider"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit/Detail Modal */}
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent className="max-w-[408px] rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-semibold text-[#131315]">
+              Modifier l&apos;activité
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-4">
+            {/* Activity Type */}
+            <div className="flex flex-col gap-2">
+              <Label className="text-xs text-[#131315] tracking-[0.12px]">Type</Label>
+              <select
+                  className="w-full appearance-none px-4 py-2 border border-[#969390] rounded-lg bg-white h-10 text-sm"
+                  value={editActivity}
+                  onChange={(e) => setEditActivity(e.target.value as ActivityType)}
+              >
+                  <option value="interventions">Garde</option>
+                  <option value="formation">Formation</option>
+                  <option value="entretien">Entretien</option>
+                  <option value="astreinte">Astreinte</option>
+                  <option value="reunion">Réunion</option>
+              </select>
+            </div>
+
+            {/* Date */}
+            <div className="flex flex-col gap-2">
+                <Label className="text-xs text-[#131315] tracking-[0.12px]">Date</Label>
+                <Input 
+                    type="date" 
+                    value={editDate} 
+                    onChange={(e) => setEditDate(e.target.value)}
+                    className="border border-[#969390]"
+                />
+            </div>
+
+            {/* Time */}
+            <div className="flex items-center gap-4">
+                <Input
+                  type="time"
+                  value={editStartTime}
+                  onChange={(e) => setEditStartTime(e.target.value)}
+                  className="border-[#f1f1f1] h-10 text-sm"
+                />
+                <span>-</span>
+                <Input
+                  type="time"
+                  value={editEndTime}
+                  onChange={(e) => setEditEndTime(e.target.value)}
+                  className="border-[#f1f1f1] h-10 text-sm"
+                />
+            </div>
+
+            {/* User */}
+            <div className="flex flex-col gap-2">
+                <Label className="text-xs text-[#131315] tracking-[0.12px]">Collaborateur</Label>
+                <select
+                    className="w-full appearance-none px-4 py-2 border border-[#969390] rounded-lg bg-white h-10 text-sm"
+                    value={editUserId}
+                    onChange={(e) => setEditUserId(e.target.value)}
+                >
+                    <option value="">(Non assigné)</option>
+                    {users.map(u => <option key={u.id} value={u.id}>{u.firstName} {u.lastName}</option>)}
+                </select>
+            </div>
+          </div>
+
+          <DialogFooter className="flex gap-2 justify-end mt-4">
+             <Button 
+                variant="destructive"
+                onClick={handleDeleteShift}
+                disabled={isDeleting}
+            >
+                {isDeleting ? "..." : "Supprimer"}
+            </Button>
+            <Button 
+                className="bg-[#ea8b49] hover:bg-[#ea8b49]/90 text-white"
+                onClick={handleUpdateShift}
+                disabled={isSubmitting}
+            >
+                {isSubmitting ? "..." : "Enregistrer"}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -1,27 +1,56 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useRouter } from "next/navigation"
 import { toast } from "react-toastify"
+import { useAuth } from "@/context/AuthContext"
 
 type TabType = "informations" | "preferences" | "securite"
 
 export default function ParametresPage() {
   const router = useRouter()
+  const { user, loading: authLoading } = useAuth()
   const [activeTab, setActiveTab] = useState<TabType>("informations")
   const [loading, setLoading] = useState(false)
 
   // Informations personnelles
-  const [nom, setNom] = useState("Delcourt")
-  const [prenom, setPrenom] = useState("Martin")
-  const [role, setRole] = useState("Chef de caserne")
-  const [email, setEmail] = useState("martin.delcourt@email.com")
+  const [nom, setNom] = useState("")
+  const [prenom, setPrenom] = useState("")
+  const [role, setRole] = useState("")
+  const [email, setEmail] = useState("")
   const [tel, setTel] = useState("00 00 00 00 00")
   const [telPro, setTelPro] = useState("")
+
+  useEffect(() => {
+    if (user) {
+      setNom(user.lastName || "")
+      setPrenom(user.firstName || "")
+      setRole(user.role === "ADMIN" ? "Administrateur" : "Utilisateur")
+      setEmail(user.email || "")
+    }
+  }, [user])
+
+  const handleSaveInfo = async () => {
+    setLoading(true)
+    try {
+      const response = await fetch('/api/user/update-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ firstName: prenom, lastName: nom, phone: telPro })
+      })
+      if (response.ok) {
+        alert('Profil mis à jour avec succès')
+      }
+    } catch (error) {
+      console.error('Erreur save:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Notifications
   const [emailNotif, setEmailNotif] = useState(true)
@@ -31,19 +60,6 @@ export default function ParametresPage() {
   const [oldPassword, setOldPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-
-  const handleSaveInfo = async () => {
-    setLoading(true)
-    try {
-      // TODO: Appel API pour sauvegarder les infos
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      toast.success("Informations mises à jour")
-    } catch (error) {
-      toast.error("Erreur lors de la sauvegarde")
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
@@ -130,7 +146,7 @@ export default function ParametresPage() {
             <div className="flex items-center gap-6 pb-6 border-b">
               <Avatar className="h-20 w-20">
                 <AvatarFallback className="bg-primary text-white text-2xl">
-                  {prenom[0]}{nom[0]}
+                  {prenom?.[0] || "U"}{nom?.[0] || ""}
                 </AvatarFallback>
               </Avatar>
               <div>

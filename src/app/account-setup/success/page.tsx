@@ -21,13 +21,28 @@ function SuccessContent() {
       return
     }
 
-    // Auto-login après paiement
-    const autoLogin = async () => {
+    // Auto-login après paiement avec retry si nécessaire
+    const autoLogin = async (retryCount = 0) => {
+      const MAX_RETRIES = 5
+      const RETRY_DELAY = 2000 // 2 secondes
+
       try {
+        setStatus("loading")
+        setMessage(retryCount > 0 
+          ? `Vérification finale (${retryCount}/${MAX_RETRIES})...` 
+          : "Vérification du paiement..."
+        )
+
         // 1. Récupérer les infos utilisateur depuis la session Stripe
         const userResponse = await fetch(`/api/stripe/session-user?session_id=${sessionId}`)
         
         if (!userResponse.ok) {
+          // Si l'utilisateur n'est pas encore créé (webhook async), on réessaie
+          if (userResponse.status === 404 && retryCount < MAX_RETRIES) {
+            console.log(`Utilisateur non trouvé, tentative ${retryCount + 1}/${MAX_RETRIES}...`)
+            setTimeout(() => autoLogin(retryCount + 1), RETRY_DELAY)
+            return
+          }
           throw new Error("Impossible de récupérer les informations utilisateur")
         }
 
@@ -59,6 +74,7 @@ function SuccessContent() {
           })
         }, 1000)
 
+        // Nettoyer le timer à la fin
         return () => clearInterval(timer)
       } catch (error) {
         console.error("Erreur auto-login:", error)

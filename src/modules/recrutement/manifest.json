@@ -1,0 +1,21 @@
+{
+  "name": "recrutement",
+  "displayName": "Recrutement",
+  "version": "1.0.0",
+  "category": "RH",
+  "description": "Module de gestion du recrutement, du sourcing à l'onboarding.",
+  "dependencies": [],
+  "prismaModels": ["Candidature"],
+  "enums": ["CandidatureStatus"],
+  "routes": {
+    "admin": [
+      "/admin/modules/recruit-firefighter",
+      "/admin/modules/recruit-firefighter/candidates"
+    ],
+    "user": [
+      "/dashboard/candidature/dossier",
+      "/dashboard/candidature/caserne"
+    ],
+    "api": ["/api/recrutement"]
+  }
+}

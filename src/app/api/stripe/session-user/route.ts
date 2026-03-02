@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server"
 import Stripe from "stripe"
 import { prisma } from "@/lib/prisma"
+import { processSuccessfulCheckout } from "@/lib/registration"
+import { withMetrics } from "@/lib/withMetrics"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-12-15.clover",
+  apiVersion: "2026-01-28.clover",
 })
 
-export async function GET(request: Request) {
+export const GET = withMetrics(async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const sessionId = searchParams.get("session_id")
@@ -31,12 +33,27 @@ export async function GET(request: Request) {
     const { email } = session.metadata
 
     // Récupérer l'utilisateur créé
-    const user = await prisma.user.findUnique({
+    let user = await prisma.user.findUnique({
       where: { email },
       include: {
         organization: true,
       },
     })
+
+    // Fallback: Si l'utilisateur n'est pas encore créé par le webhook
+    // et que le paiement est réussi, on le crée ici.
+    if (!user && session.payment_status === "paid" && session.status === "complete") {
+      console.log(`Utilisateur ${email} non trouvé, création via API fallback...`)
+      const result = await processSuccessfulCheckout(session)
+      
+      // On recharge l'utilisateur avec l'organisation
+      user = await prisma.user.findUnique({
+        where: { email },
+        include: {
+          organization: true,
+        },
+      })
+    }
 
     if (!user) {
       return NextResponse.json(
@@ -58,4 +75,4 @@ export async function GET(request: Request) {
       { status: 500 }
     )
   }
-}
+})

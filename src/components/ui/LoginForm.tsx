@@ -4,10 +4,13 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'react-toastify'
 import { TextInput } from './TextInput'
 import { PrimaryButton } from './PrimaryButton'
+import { useAuth } from '@/context/AuthContext'
 
 export default function LoginForm() {
   const router = useRouter()
+  const { login } = useAuth()
   const [identifier, setIdentifier] = useState('')
+// ... (rest of imports and component starts)
   const [password, setPassword] = useState('')
   const [remember, setRemember] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -32,6 +35,10 @@ export default function LoginForm() {
       }
 
       toast.success('Connexion réussie !')
+      
+      // Mise à jour de l'état global
+      login(data.user)
+
       // Redirection selon le rôle
       const redirectUrl = data.user.role === 'ADMIN' ? '/admin' : '/dashboard'
       setTimeout(() => router.push(redirectUrl), 500)

@@ -1,190 +1,101 @@
-# Intervention Modules
+# Architecture du Projet Vitall
 
-**Plateforme modulaire pour les services institutionnels**
-
-*(Pompiers, Police, Hôpitaux, etc.)*
-
-> Projet de développement d’une suite d’applications modulaires destinée aux services d’intervention.
-> 
-> 
-> Premier module développé : **Recrutement des pompiers volontaires**.
-> 
+> **Plateforme modulaire pour les services institutionnels**
 
 ---
 
-## Objectifs
+## Sommaire
 
-Ce projet vise à créer une architecture **modulaire, scalable et réutilisable** pour différents services publics, en commençant par le **recrutement des pompiers volontaires**.
-
-Chaque module est **indépendant mais interconnecté** (authentification commune, base de données unifiée, design system partagé).
-
-### Modules prévus
-
-- **Recrutement** — gestion des candidatures, entretiens et statuts
-- **Ressources humaines** — profils, affectations, formations
-- **Intervention** — planification et suivi des missions
-- **Administration** — gestion interne, statistiques et documents
+1. [ Documentation technique (Lancer le projet)](#documentation-technique-lancer-le-projet)
+2. [ Architecture & Démarche DevSecOps](#architecture--démarche-devsecops)
+3. [ Déploiement & Maintenance](#déploiement--maintenance)
 
 ---
 
-## Stack technique
+## Documentation technique (Lancer le projet)
 
-| Domaine | Technologie |
-| --- | --- |
-| **Framework** | [Next.js 15](https://nextjs.org/) |
-| **Langage** | TypeScript |
-| **Style** | TailwindCSS + Design system Figma |
-| **UI Components** | [shadcn/ui](https://ui.shadcn.com/) |
-| **Auth & Backend** | à définir (Supabase, PostgreSQL ou API custom) |
-| **Déploiement** | VPS ou [Vercel](https://vercel.com/) |
-| **IA Agents** | (à venir) pour génération de code et automatisation |
+### Installation Locale (sans Docker)
 
----
+1. **Cloner le dépôt** : `git clone <url-du-repo> && cd vitall-solution`
+2. **Variables d'environnement** : `cp .env.example .env`
+3. **Dépendances** : `npm install`
+4. **Base de données** :
+   ```bash
+   npx prisma generate
+   npx prisma db push
+   npx tsx prisma/seed.ts
+   ```
+5. **Démarrer** : `npm run dev`
 
-## Structure du projet
-
-intervention-modules/
-
-├── src/
-
-│   ├── app/                # Routes Next.js (App Router)
-
-│   ├── components/         # UI et Design System
-
-│   ├── modules/
-
-│   │   └── recruitment/    # Module Recrutement pompier volontaire
-
-│   ├── lib/                # Clients / outils (supabase, api, etc.)
-
-│   └── types/              # Types TS globaux
-
-├── public/                 # Assets
-
-├── .env.example
-
-├── package.json
-
-├── tsconfig.json
-
-├── tailwind.config.ts
-
-└── README.md
-
-Clone le dépôt :
+### Installation via Docker
 
 ```bash
-git clone <https://github.com/><ton-user>/intervention-modules.git
-cd intervention-modules
-```
-
-Installe les dépendances :
-
-```bash
-npm install
-
-```
-
-### Configuration des variables d’environnement
-
-Copie le modèle `.env.example` vers `.env` :
-
-```bash
-cp .env.example .env
-
-```
-
-**Ne jamais commit le fichier `.env`**
-
-Ce fichier contient des informations sensibles (tokens, clés API).
-
-Remplis les valeurs selon ton environnement :
-
-```bash
-FIGMA_TOKEN=your_figma_token_here
-FIGMA_FILE_KEY=your_figma_file_key_here
-OPENAI_API_KEY=placeholder_key
-FIGMA_URL=https://www.figma.com/file/<your_file_key>
+docker compose up -d
 ```
 
 ---
 
-### Lancer le projet localement
+## Architecture & Démarche DevSecOps
 
-```bash
-npm run dev
-```
+### Philosophie du Projet
 
-Ouvre [http://localhost:3000](http://localhost:3000/)
+Notre approche repose sur la philosophie **DevSecOps** : la sécurité n'est pas une étape finale mais une composante continue du cycle de développement ("Shift-Left Security"). Chaque modification de code est automatiquement validée sous l'angle de la qualité, de la sécurité et de la résilience.
 
----
+### Pourquoi ces outils ?
 
-## Module actuel : Recrutement pompier volontaire
+![Security Scan Report](docs/evidences/security-scan-report.png)
 
-### Objectif
+*   **Snyk & Alpine Linux** : Nous avons identifié que les images standard (Debian/Ubuntu) embarquent souvent des centaines de vulnérabilités connues (CVE). En passant à **Alpine Linux**, nous avons réduit ce nombre à **zéro** pour l'image de base. Snyk agit comme une barrière bloquante en CI si une nouvelle vulnérabilité critique est introduite via une dépendance npm.
+*   **Gitleaks** : La fuite de secrets (clés Stripe, tokens GH) est le premier vecteur d'attaque. Gitleaks scanne l'historique complet pour empêcher tout commit contenant un secret en clair.
+*   **GitHub Actions** : Pour l'automatisation totale ("Security as Code"). Le pipeline ne se contente pas de builder l'image, il audite chaque brique avant de pousser en production.
 
-Permettre à une personne de :
+### Défis rencontrés & Solutions
 
-- Créer un compte volontaire
-- Remplir un dossier de candidature
-- Suivre son statut (en attente, entretien, accepté, rejeté)
-- Échanger avec les responsables du centre
-
-### Fonctionnalités prévues
-
-- Formulaire dynamique basé sur la maquette Figma
-- Authentification (NextAuth ou Supabase)
-- Espace admin (validation, filtres, exports)
-- Gestion et tri des candidatures
+*   **Problème** : Taille des images Docker et lenteur des pipelines.
+*   **Solution** : Utilisation du **Multi-stage Build**. On ne garde que le binaire compilé de Next.js (`standalone`) et on supprime `npm` de l'image de production (éliminant ainsi les vulnérabilités liées au gestionnaire de paquets).
+*   **Problème** : Dépendance au réseau lors du déploiement.
+*   **Solution** : Utilisation d'un registre d'images (GHCR) privé et sécurisé permettant des rollbacks instantanés.
 
 ---
 
-## Design & UI
+## Déploiement & Maintenance
 
-- Prendre la **maquette Figma** fournie
-- Identifier les composants et les intégrer avec **Copilot** (ou un agent IA futur)
-- Framework utilisé : **Next.js + TailwindCSS + shadcn/ui**
-- Respecter la structure standardisée dans `@/components/ui/`
+### Pipeline Pipeline CI/CD
 
----
+![CI Pipeline Success](docs/evidences/ci-pipeline-success.png)
 
-## Workflow de production
+Chaque push sur `main` déclenche un audit complet :
+1.  **Audits de code** (Tests unitaires & SonarQube).
+2.  **Scan de vulnérabilités** conteneur avec Snyk.
+3.  **Détection de secrets** avec Gitleaks.
+4.  **Déploiement atomique** sur le VPS si 100% des tests sont verts.
 
-1. **Prendre la maquette** depuis Figma
-2. **Extraire les composants UI** (manuellement ou via Copilot)
-3. **Coder le module** en Next.js + Tailwind
-4. **Connecter la base de données** (Supabase à valider)
-5. **Tester localement**, commit et push sur GitHub
+### Monitoring & Observabilité
 
----
+![Monitoring Dashboard](docs/evidences/monitoring-dashboard.png)
 
-## Scripts utiles
+L'état de santé est surveillé via la stack **Prometheus / Grafana / Loki** :
+- **Dashboard en direct** : Visualisation du CPU, RAM, et taux de requêtes HTTP.
+- **Loki** : Centralisation des logs applicatifs pour un debugging rapide en cas d'incident.
 
-| Commande | Description |
-| --- | --- |
-| `npm run dev` | Lance le serveur de développement |
-| `npm run build` | Compile le projet pour la production |
-| `npm run lint` | Vérifie la qualité du code |
-| `npm run start` | Démarre l’app compilée |
+### Accès sécurisé (Checklist)
 
----
+![Application HTTPS Access](docs/evidences/app-https.png)
 
-## Bonnes pratiques
+- [x] **HTTPS/SSL** : Chiffrement intégral des échanges.
+- [x] **Rollback Procédure** : Commande prête pour retour arrière en < 30s.
+- [x] **Secret Management** : Variables d'environnement injectées dynamiquement.
 
-- Ne jamais committer le fichier `.env`
-- Exécuter `npm run lint` avant chaque commit
-- Organiser le code en modules (`/modules/`)
-- Documenter les PR et commits clairement
-- Centraliser les composants dans `@/components/ui/`
+### Procédure de Rollback
 
----
-
-*M2 Chef de Projet Digital — Option Fullstack*
-
-Démarré en **2025**
+Si la production échoue :
+1. **Via GitHub Actions** : Ré-exécuter le dernier job réussi.
+2. **Manuellement** :
+   ```bash
+   docker compose pull
+   docker compose up -d --force-recreate
+   ```
+3. **Retour BDD** : `docker compose exec -T postgres psql -U vitall_user vitall_db < backup_prev.sql`
 
 ---
-
-## Licence
-
-Projet à usage académique et interne.
+*M2 Chef de Projet Digital — Option Fullstack — 2025/2026*

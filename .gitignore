@@ -47,3 +47,6 @@ next-env.d.ts
 
 # Ignorer la migration d'initialisation locale
 prisma/migrations/*_init_local/
+
+#Hot reload pour le développement
+docker-compose.override.yml

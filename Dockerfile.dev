@@ -1,0 +1,22 @@
+# Dockerfile.dev - Development image with full dependencies
+FROM node:20-alpine
+
+# Mise à jour de npm pour corriger les vulnérabilités de sécurité
+RUN npm install -g npm@11.6.4
+
+# Installation des dépendances système nécessaires
+RUN apk add --no-cache openssl libc6-compat python3 make g++
+
+WORKDIR /app
+
+# Install ALL dependencies (including devDependencies)
+COPY package.json package-lock.json* ./
+RUN npm ci
+
+# Copy prisma schema and generate client
+COPY prisma ./prisma
+RUN npx prisma generate
+
+# Source code comes from bind mount, not COPY
+# Run as root to avoid permission issues with mounted volumes
+EXPOSE 3000

@@ -1,0 +1,21 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    environment:
+      NODE_ENV: "development"
+    entrypoint: ["sh", "-c"]
+    command:
+      - |
+        echo "📦 Syncing dependencies..."
+        npm install
+        echo "🔄 Pushing Prisma schema..."
+        npx prisma generate
+        npx prisma db push --accept-data-loss
+        echo "🚀 Starting dev server with Hot Reload..."
+        exec npm run dev
+    volumes:
+      - ./:/app
+      - /app/node_modules
+      - /app/.next

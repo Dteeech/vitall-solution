@@ -2,8 +2,9 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { verifyAuth } from "@/lib/auth"
 import bcrypt from "bcryptjs"
+import { withMetrics } from "@/lib/withMetrics"
 
-export async function POST(request: Request) {
+export const POST = withMetrics(async function POST(request: Request) {
   try {
     const payload = await verifyAuth(request)
     if (!payload) {
@@ -57,4 +58,4 @@ export async function POST(request: Request) {
       { status: 500 }
     )
   }
-}
+})

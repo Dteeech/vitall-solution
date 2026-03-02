@@ -2,12 +2,13 @@ import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
 import { jwtVerify } from "jose"
 import { prisma } from "@/lib/prisma"
+import { withMetrics } from "@/lib/withMetrics"
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || "votre-secret-super-securise-changez-moi"
 )
 
-export async function GET() {
+export const GET = withMetrics(async function GET() {
   try {
     const cookieStore = await cookies()
     const token = cookieStore.get("auth-token")
@@ -55,4 +56,4 @@ export async function GET() {
       { status: 401 }
     )
   }
-}
+})

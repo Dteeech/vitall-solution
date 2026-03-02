@@ -1,8 +1,6 @@
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth'; // Ou votre méthode d'auth
-// import { authOptions } from '../auth/[...nextauth]/route'; // Adaptez le chemin selon votre config next-auth
 
 // Temporaire : mock session retrieval si pas encore configuré
 // Dans la réalité, vous utiliserez getServerSession

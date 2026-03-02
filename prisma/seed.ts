@@ -1,6 +1,7 @@
 
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
+import { addDays, startOfWeek, addHours, format } from 'date-fns'
 
 const prisma = new PrismaClient()
 
@@ -42,40 +43,32 @@ async function main() {
 
   // Créer une organisation de test
   const organizationAdmin = await prisma.organization.upsert({
-    where: { id: 'org-admin-id' },
-    update: { name: 'Organisation Admin test', address: '4 chemin de la Chatterie, 44100 Saint-Herblain' },
+    where: { id: 'org-admin-id' }, // Utiliser un ID fixe pour pouvoir rafraichir le seed sans erreur
+    update: {
+        name: 'Organisation Admin test',
+        address: '4 chemin de la Chatterie, 44100 Saint-Herblain',
+    },
     create: {
+      id: 'org-admin-id',
       name: 'Organisation Admin test',
       address: '4 chemin de la Chatterie, 44100 Saint-Herblain',
     },
   });
-  console.log(`Upserted organization: ${organizationAdmin.name} (id: ${organizationAdmin.id})`);
+  console.log(`Upserted organization: ${organizationAdmin.name}`);
 
-  const organizationUser = await prisma.organization.upsert({
-    where: { id: 'org-user-id' },
-    update: { name: 'Organisation de USER test', address: '4 chemin de la Chatterie, 44100 Saint-Herblain' },
-    create: {
-      name: 'Organisation de USER test',
-      address: '4 chemin de la Chatterie, 44100 Saint-Herblain',
-    },
-  });
-  console.log(`Upserted organization: ${organizationUser.name} (id: ${organizationUser.id})`);
-  
   // Hash des mots de passe depuis les variables d'environnement
-  const adminPassword = process.env.SEED_ADMIN_PASSWORD || 'ChangeMeInProduction!';
-  const userPassword = process.env.SEED_USER_PASSWORD || 'ChangeMeInProduction!';
-  
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD || 'password123';
   const hashedAdminPassword = await bcrypt.hash(adminPassword, 10);
-  const hashedUserPassword = await bcrypt.hash(userPassword, 10);
 
-  // Création Admin — update inclut organizationId pour rattraper les users existants
+  // Création Admin
   const admin = await prisma.user.upsert({
     where: { email: 'admin@test.fr' },
     update: {
-      organizationId: organizationAdmin.id,
-      role: 'ADMIN',
-      firstName: 'Admin',
-      lastName: 'Vitall',
+        password: hashedAdminPassword,
+        role: 'ADMIN',
+        firstName: 'Admin',
+        lastName: 'Vitall',
+        organizationId: organizationAdmin.id,
     },
     create: {
       email: 'admin@test.fr',
@@ -86,78 +79,71 @@ async function main() {
       organizationId: organizationAdmin.id,
     },
   });
-  console.log(`Upserted admin user: ${admin.email} (orgId: ${admin.organizationId})`);
+  console.log(`Upserted admin user: ${admin.email}`);
 
-  // Création User Standard
-  const user = await prisma.user.upsert({
-    where: { email: 'user@test.fr' },
-    update: {
-      organizationId: organizationUser.id,
-      role: 'USER',
-      firstName: 'User',
-      lastName: 'Vitall',
-    },
-    create: {
-      email: 'user@test.fr',
-      password: hashedUserPassword,
-      role: 'USER',
-      firstName: 'User',
-      lastName: 'Vitall',
-      organizationId: organizationUser.id,
-    },
-  });
-  console.log(`Upserted standard user: ${user.email} (orgId: ${user.organizationId})`);
+  // --- SEED CANDIDATURES ---
+  const candidaturesData = [
+    { firstName: 'Jean', lastName: 'Dupont', email: 'jean.dupont@example.com', status: 'PENDING' },
+    { firstName: 'Sophie', lastName: 'Martin', email: 'sophie.martin@example.com', status: 'INTERVIEW' },
+    { firstName: 'Lucas', lastName: 'Bernard', email: 'lucas.bernard@example.com', status: 'REJECTED' },
+    { firstName: 'Emma', lastName: 'Petit', email: 'emma.petit@example.com', status: 'ACCEPTED' },
+  ];
 
-  // Créer la subscription pour l'organisation Admin
-  const subscription = await prisma.subscription.upsert({
-    where: { organizationId: organizationAdmin.id },
-    update: { status: 'ACTIVE' },
-    create: {
-      organizationId: organizationAdmin.id,
-      status: 'ACTIVE',
-      startDate: new Date(),
-      monthlyPrice: 270.0,
-    },
-  });
-  console.log(`Upserted subscription: ${subscription.id} (org: ${organizationAdmin.name})`);
-
-  // Activer le module Planning par défaut pour l'admin
-  const planningModule = await prisma.module.findUnique({ where: { name: 'Planning' } });
-  const recrutementModule = await prisma.module.findUnique({ where: { name: 'Recrutement' } });
-
-  if (planningModule) {
-    await prisma.subscriptionModule.upsert({
-      where: {
-        subscriptionId_moduleId: {
-          subscriptionId: subscription.id,
-          moduleId: planningModule.id,
-        },
-      },
-      update: {},
-      create: {
-        subscriptionId: subscription.id,
-        moduleId: planningModule.id,
-      },
-    });
-    console.log(`Activated module: Planning`);
+  for (const cand of candidaturesData) {
+      await prisma.candidature.create({
+          data: {
+              firstName: cand.firstName,
+              lastName: cand.lastName,
+              email: cand.email,
+              status: cand.status as any,
+              organizationId: organizationAdmin.id
+          }
+      });
   }
+  console.log(`Seeded ${candidaturesData.length} candidatures`);
 
-  if (recrutementModule) {
-    await prisma.subscriptionModule.upsert({
-      where: {
-        subscriptionId_moduleId: {
-          subscriptionId: subscription.id,
-          moduleId: recrutementModule.id,
-        },
-      },
-      update: {},
-      create: {
-        subscriptionId: subscription.id,
-        moduleId: recrutementModule.id,
-      },
-    });
-    console.log(`Activated module: Recrutement`);
+  // --- SEED PLANNING & SHIFTS ---
+  const planning = await prisma.planning.create({
+      data: {
+          name: "Planning Principal",
+          organizationId: organizationAdmin.id
+      }
+  });
+  console.log(`Created Planning: ${planning.name}`);
+
+  const today = new Date();
+  const startOfCurrentWeek = startOfWeek(today, { weekStartsOn: 1 }); // Start Monday
+
+  const shiftsData = [
+      { dayOffset: 0, startHour: 8, endHour: 16, type: 'GARDE' }, // Lundi
+      { dayOffset: 1, startHour: 9, endHour: 17, type: 'FORMATION' }, // Mardi
+      { dayOffset: 2, startHour: 14, endHour: 22, type: 'GARDE' }, // Mercredi
+      { dayOffset: 3, startHour: 8, endHour: 12, type: 'REUNION' }, // Jeudi matin
+      { dayOffset: 4, startHour: 18, endHour: 23, type: 'ASTREINTE' }, // Vendredi soir
+  ];
+
+  for (const shift of shiftsData) {
+      const shiftDate = addDays(startOfCurrentWeek, shift.dayOffset);
+      
+      const startTime = new Date(shiftDate);
+      startTime.setHours(shift.startHour, 0, 0, 0);
+      
+      const endTime = new Date(shiftDate);
+      endTime.setHours(shift.endHour, 0, 0, 0);
+
+      await prisma.shift.create({
+          data: {
+              planningId: planning.id,
+              userId: admin.id, // Assigné à l'admin pour le test
+              startTime: startTime,
+              endTime: endTime,
+              type: shift.type as any,
+              isAvailable: false
+          }
+      });
   }
+  console.log(`Seeded ${shiftsData.length} shifts for this week`);
+
 
   console.log(`Seeding finished.`);
 }

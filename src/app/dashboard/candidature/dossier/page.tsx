@@ -1,12 +1,143 @@
+"use client"
+
+import { Card } from "@/components/ui/Card"
+import {
+  FileIcon,
+  Download,
+  Cake,
+  MapPin,
+  AtSign,
+  Briefcase,
+  Calendar,
+  FileText
+} from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+
 export default function DossierPage() {
+  const sections = [
+    {
+      title: "Vos résultats",
+      theme: "blue",
+      items: [
+        { name: "Tests sportifs.pdf", size: "2.3 Mo" },
+        { name: "Visite médicale.pdf", size: "2.1 Mo" },
+      ]
+    },
+    {
+      title: "Documents personnels",
+      theme: "white",
+      items: [
+        { name: "Permis de conduire.pdf", size: "3 Mo" },
+        { name: "Carte d'identité.pdf", size: "2 Mo" },
+        { name: "Titre de séjour.jpg", size: "1.5 Mo" },
+      ]
+    },
+    {
+      title: "Candidature",
+      theme: "white",
+      items: [
+        { name: "CV.pdf", size: "3 Mo" },
+        { name: "Lettre de motivation.pdf", size: "2 Mo" },
+        { name: "Justificatif de domicile.pdf", size: "3 Mo" },
+      ]
+    },
+    {
+      title: "Diplômes",
+      theme: "white",
+      items: [
+        { name: "Diplôme de Baccalauréat.pdf", size: "2.5 Mo" },
+        { name: "Attestation PSC1.pdf", size: "1.2 Mo" },
+      ]
+    }
+  ]
+
+  const userInfo = [
+    { icon: Cake, label: "Âge", value: "12/05/1995" },
+    { icon: MapPin, label: "Adresse", value: "Saint-Herblain" },
+    { icon: AtSign, label: "Email", value: "matinleo@mail.com" },
+    { icon: Briefcase, label: "Métier", value: "Plombier" },
+    { icon: Calendar, label: "Candidature", value: "05/09/2025" },
+  ]
+
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold text-neutral-900 mb-6">Mon Dossier</h1>
-      
-      <div className="bg-white rounded-lg shadow p-6">
-        <p className="text-neutral-600">
-          Cette page contiendra les informations de votre dossier de candidature.
-        </p>
+    <div className="min-h-screen bg-white p-8">
+      <header className="mb-12">
+        <h1 className="text-2xl font-bold text-[#132E49] mb-8">Dossier</h1>
+
+        <div className="flex items-start gap-12">
+          {/* Profile Avatar */}
+          <div className="relative">
+            <div className="w-32 h-32 rounded-full overflow-hidden bg-[#7195AA]/60 flex items-center justify-center border-4 border-white shadow-sm">
+              <span className="text-4xl font-bold text-white">ML</span>
+            </div>
+          </div>
+
+          {/* Profile Info */}
+          <div className="flex-1">
+            <div className="flex items-center gap-4 mb-6">
+              <h2 className="text-2xl font-bold text-[#132E49]">Martin Léo</h2>
+              <span className="px-3 py-1 bg-[#D3E1EB] text-[#132E49] text-xs font-bold rounded-md">
+                Visite médicale à faire
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-3 gap-x-12">
+              {userInfo.map((item, i) => (
+                <div key={i} className="flex items-center gap-6 group">
+                  <div className="w-6 h-6 flex items-center justify-center">
+                    <item.icon size={18} className="text-gray-400 group-hover:text-[#132E49] transition-colors" />
+                  </div>
+                  <div className="flex justify-between flex-1 max-w-[200px]">
+                    <span className="text-sm font-medium text-gray-500">{item.label}</span>
+                    <span className="text-sm font-bold text-[#132E49]">{item.value}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="space-y-6">
+        <div className="flex items-center gap-3 mb-4">
+          <FileText size={24} className="text-[#132E49]" />
+          <h2 className="text-xl font-bold text-[#132E49]">Vos documents</h2>
+        </div>
+
+        {sections.map((section, idx) => (
+          <div
+            key={idx}
+            className={`rounded-3xl p-8 ${section.theme === 'blue' ? 'bg-[#EAF1F9]' : 'bg-white border border-gray-100 shadow-sm'
+              }`}
+          >
+            <h3 className="text-lg font-bold text-[#132E49] mb-6">{section.title}</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {section.items.map((doc, docIdx) => (
+                <div
+                  key={docIdx}
+                  className="bg-white p-4 rounded-2xl flex items-center justify-between border border-gray-50 shadow-sm group hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-[#132E49] rounded-lg flex items-center justify-center shadow-sm">
+                      <FileIcon size={18} className="text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-[#132E49] leading-tight truncate max-w-[150px]">
+                        {doc.name}
+                      </p>
+                      <p className="text-xs text-gray-400 font-medium">
+                        {doc.size}
+                      </p>
+                    </div>
+                  </div>
+                  <button className="p-2 text-[#132E49] hover:bg-gray-50 rounded-lg transition-colors">
+                    <Download size={20} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   )

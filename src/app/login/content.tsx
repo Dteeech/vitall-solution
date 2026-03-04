@@ -5,7 +5,7 @@ import LoginForm from '@/components/ui/LoginForm'
 
 export default function LoginPageContent() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-neutral-50 p-6">
       <div className="w-full max-w-6xl bg-white shadow-sm rounded-lg overflow-hidden grid grid-cols-1 md:grid-cols-2">
         {/* Left artwork */}
         <div className="hidden md:flex bg-primary-softer p-8 items-center justify-start w-full ">

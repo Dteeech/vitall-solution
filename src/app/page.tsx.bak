@@ -86,7 +86,7 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
               <Button asChild size="lg" className="bg-[#0F172A] hover:bg-[#1E293B] text-white rounded-full px-8 h-14 text-base font-semibold w-full sm:w-auto">
                 <Link href="/account-setup">
-                  Obtenir un essai gratuit
+                  Se connecter / créer un compte
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="bg-white border-gray-200 text-[#0F172A] hover:bg-gray-50 rounded-full px-8 h-14 text-base font-semibold w-full sm:w-auto">

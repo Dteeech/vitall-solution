@@ -1,6 +1,6 @@
 import { AuthNavbar } from '@/components/auth/AuthNavbar'
 
-export default function AccountSetupLayout({
+export default function LoginLayout({
   children,
 }: Readonly<{
   children: React.ReactNode

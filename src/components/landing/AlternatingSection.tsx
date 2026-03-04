@@ -13,7 +13,7 @@ interface AlternatingSectionProps {
 export const AlternatingSection = ({ title, description, items, reverse = false }: AlternatingSectionProps) => {
   return (
     <section className="py-24 bg-white">
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-6 max-w-6xl">
         <div className={`flex flex-col lg:flex-row items-center gap-16 ${reverse ? 'lg:flex-row-reverse' : ''}`}>
           <motion.div
             initial={{ opacity: 0, x: reverse ? 40 : -40 }}

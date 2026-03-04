@@ -98,17 +98,17 @@ export const ModuleTabs = () => {
 
   return (
     <section className="py-24 bg-white">
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-6 max-w-6xl">
         <div className="text-center mb-16">
           <span className="bg-[#132E49] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">
             Modules
           </span>
           <h2 className="text-4xl md:text-5xl font-bold text-[#132E49] mt-6 mb-4">
-            Un ERP sur mesure construit autour de vos besoins
+            Un logiciel de gestion sur mesure construit autour de vos besoins
           </h2>
           <div className="text-gray-500 max-w-2xl mx-auto space-y-2">
-            <p>Vitall propose un ERP modulaire qui permet de composer votre solution selon vos besoins.</p>
-            <p>Votre ERP sur mesure évolue avec votre organisation.</p>
+            <p>Vitall propose un logiciel de gestion sur mesure qui permet de composer votre solution selon vos besoins.</p>
+            <p>Votre logiciel de gestion sur mesure évolue avec votre organisation.</p>
           </div>
         </div>
 

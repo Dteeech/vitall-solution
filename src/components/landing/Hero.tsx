@@ -13,7 +13,7 @@ export const Hero = () => {
         <div className="absolute top-[20%] -right-[5%] w-[30%] h-[30%] bg-blue-50/50 rounded-full blur-[100px]" />
       </div>
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto px-6 max-w-6xl relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -28,17 +28,17 @@ export const Hero = () => {
 
           <div className="lg:max-w-md w-full">
             <p className="text-gray-500 mb-8 text-lg">
-              Vitall, l’ERP sur mesure conçu pour les structures d’intervention.
+              Vitall, l’Logiciel de gestion sur mesure conçu pour les structures d’intervention.
               La plateforme centralise la gestion des équipes, des ressources et des opérations dans un seul outil.
-              Un ERP conçu pour simplifier l’organisation et améliorer l’efficacité des équipes sur le terrain.
+              Un Logiciel de gestion sur mesure conçu pour simplifier l’organisation et améliorer l’efficacité des équipes sur le terrain.
 
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
-                href="#trial"
+                href="/account-setup"
                 className="py-6 flex-1 w-full bg-[#132E49] hover:bg-[#1a3e61] text-white rounded-md px-8 h-12 flex items-center justify-center text-normal font-normal cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
-                Obtenir un essai gratuit
+                Mon compte
               </Link>
               <Link
                 href="#demo"

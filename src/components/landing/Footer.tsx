@@ -5,33 +5,65 @@ import Link from 'next/link'
 
 export const Footer = () => {
   return (
-    <footer className="py-12 bg-white border-t border-gray-50">
-      <div className="container mx-auto px-6">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-2">
-            <Image
-              src="/assets/images/logo-hompepage.avif"
-              alt="Vitall Logo"
-              width={100}
-              height={32}
-              className="h-8 w-auto"
-            />
+    <footer className="py-16 bg-white border-t border-gray-50">
+      <div className="container mx-auto px-6 max-w-6xl">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
+          {/* Column 1: Logo and text */}
+          <div className="space-y-6">
+            <Link href="/" className="inline-block cursor-pointer">
+              <Image
+                src="/assets/images/logo-hompepage.avif"
+                alt="Vitall Logo"
+                width={140}
+                height={45}
+                className="h-10 w-auto"
+              />
+            </Link>
+            <p className="text-gray-800 text-sm leading-relaxed max-w-[220px] font-medium">
+              Alléger le quotidien de ceux<br />qui veillent sur le nôtre
+            </p>
           </div>
 
-          <nav className="flex flex-wrap justify-center gap-8">
-            {['Accueil', 'Modules', 'Métiers', 'Tarifs', 'Guides', 'Contact'].map((item) => (
-              <Link
-                key={item}
-                href="#"
-                className="text-xs font-semibold text-gray-400 hover:text-black transition-colors cursor-pointer"
-              >
-                {item}
-              </Link>
-            ))}
-          </nav>
+          {/* Column 2: Restons en contact */}
+          <div>
+            <h4 className="text-gray-500 font-medium text-sm mb-6">Restons en contact</h4>
+            <ul className="space-y-4">
+              {['Qui sommes nous ?', 'Nous contacter', 'Newsletter'].map((item) => (
+                <li key={item}>
+                  <Link href="#" className="text-sm font-semibold text-[#132E49] hover:text-[#EA8B49] transition-colors cursor-pointer">
+                    {item}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-          <div className="text-xs text-gray-400 font-medium">
-            © {new Date().getFullYear()} Vitall. Tous droits réservés.
+          {/* Column 3: Vitall */}
+          <div>
+            <h4 className="text-gray-500 font-medium text-sm mb-6">Vitall</h4>
+            <ul className="space-y-4">
+              {['Modules', 'Métiers', 'Tarif', 'FAQ', 'Contact'].map((item) => (
+                <li key={item}>
+                  <Link href="#" className="text-sm font-semibold text-[#132E49] hover:text-[#EA8B49] transition-colors cursor-pointer">
+                    {item}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Column 4: Légal */}
+          <div>
+            <h4 className="text-gray-500 font-medium text-sm mb-6">Légal</h4>
+            <ul className="space-y-4">
+              {['Politique de confidentialité', 'Mentions légales', 'Accessibilité', 'Plan du site', 'Cookies'].map((item) => (
+                <li key={item}>
+                  <Link href="#" className="text-sm font-semibold text-[#132E49] hover:text-[#EA8B49] transition-colors cursor-pointer">
+                    {item}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>

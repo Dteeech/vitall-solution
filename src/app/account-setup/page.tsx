@@ -407,7 +407,7 @@ export default function AccountSetupPage() {
   const prev = () => setStep((s) => Math.max(s - 1, 1) as Step)
 
   return (
-    <main className="min-h-screen bg-neutral-50 px-6 py-10">
+    <main className="min-h-[calc(100vh-4rem)] bg-neutral-50 px-6 py-10">
       <div className="max-w-2xl mx-auto">
         {/* Title */}
         <h1 className="text-3xl font-bold text-neutral-900 mb-6">

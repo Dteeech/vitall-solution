@@ -31,7 +31,7 @@ export default function LandingPageClient() {
 
         <AlternatingSection
           title="Automatiser les processus administratifs"
-          description="L’un des objectifs d’un ERP sur mesure est de réduire les tâches administratives. Vitall permet d’automatiser la gestion du planning, le suivi des candidatures et les dossiers RH."
+          description="L’un des objectifs d’un Logiciel de gestion sur mesure est de réduire les tâches administratives. Vitall permet d’automatiser la gestion du planning, le suivi des candidatures et les dossiers RH."
           items={[
             "Automatisation du planning",
             "Suivi des candidatures intelligent",
@@ -43,7 +43,7 @@ export default function LandingPageClient() {
 
         <AlternatingSection
           title="Piloter vos ressources et vos équipements"
-          description="Vitall centralise la gestion des ressources opérationnelles. L’ERP permet notamment de gérer les équipements, l’inventaire matériel et le logiciel de gestion de flotte."
+          description="Vitall centralise la gestion des ressources opérationnelles. Logiciel de gestion sur mesure permet notamment de gérer les équipements, l’inventaire matériel et le logiciel de gestion de flotte."
           items={[
             "Gestion centralisée des équipements",
             "Inventaire matériel en temps réel",
@@ -53,9 +53,9 @@ export default function LandingPageClient() {
         />
 
         <section className="py-24 bg-gray-50">
-          <div className="container mx-auto px-6">
+          <div className="container mx-auto px-6 max-w-6xl">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-[#132E49] mb-4">Un ERP sur mesure pour piloter votre organisation</h2>
+              <h2 className="text-4xl font-bold text-[#132E49] mb-4">Un Logiciel de gestion sur mesure pour piloter votre organisation</h2>
               <p className="text-gray-500 max-w-2xl mx-auto">Vitall permet de structurer et de piloter votre organisation grâce à un système centralisé.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -76,9 +76,9 @@ export default function LandingPageClient() {
         </section>
 
         <section className="py-24 bg-white">
-          <div className="container mx-auto px-6">
+          <div className="container mx-auto px-6 max-w-6xl">
             <div className="max-w-4xl mx-auto">
-              <h2 className="text-4xl font-bold text-[#132E49] mb-8 text-center">Un ERP pensé pour les réalités du terrain</h2>
+              <h2 className="text-4xl font-bold text-[#132E49] mb-8 text-center">Un Logiciel de gestion sur mesure pensé pour les réalités du terrain</h2>
               <p className="text-gray-500 text-lg mb-12 text-center">
                 Les services d’intervention ont besoin d’outils simples, fiables et adaptés à leur organisation. Vitall a été conçu pour répondre à ces contraintes.
               </p>

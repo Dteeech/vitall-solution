@@ -24,7 +24,7 @@ export const Navbar = () => {
       animate={{ y: 0 }}
       className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100"
     >
-      <div className="container mx-auto flex items-center justify-between px-6 py-4">
+      <div className="container mx-auto max-w-6xl flex items-center justify-between px-6 py-4">
         <Link href="/" className="flex items-center gap-2 cursor-pointer relative z-50">
           <Image
             src="/assets/images/logo-hompepage.avif"
@@ -61,10 +61,10 @@ export const Navbar = () => {
             </motion.div>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }}>
               <Link
-                href="#trial"
+                href="/account-setup"
                 className="bg-[#132E49] hover:bg-[#1a3e61] text-white text-sm font-semibold rounded-md px-6 py-2 cursor-pointer transition-all"
               >
-                Obtenir un essai gratuit
+                Mon compte
               </Link>
             </motion.div>
           </div>
@@ -108,11 +108,11 @@ export const Navbar = () => {
                   Demander une démo
                 </Link>
                 <Link
-                  href="#trial"
+                  href="/account-setup"
                   onClick={() => setIsOpen(false)}
                   className="bg-[#132E49] text-white font-bold text-center py-4 rounded-xl shadow-lg cursor-pointer"
                 >
-                  Obtenir un essai gratuit
+                  Mon compte
                 </Link>
               </div>
             </div>

@@ -36,13 +36,13 @@ export const Hero = () => {
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="#trial"
-                className="flex-1 w-full bg-[#132E49] hover:bg-[#1a3e61] text-white rounded-md px-8 h-12 flex items-center justify-center text-normal font-normal cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98]"
+                className="py-6 flex-1 w-full bg-[#132E49] hover:bg-[#1a3e61] text-white rounded-md px-8 h-12 flex items-center justify-center text-normal font-normal cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                 Obtenir un essai gratuit
               </Link>
               <Link
                 href="#demo"
-                className="flex-1 w-full border border-[#EA8B49] text-[#EA8B49] hover:bg-orange-50 rounded-md px-8 h-12 flex items-center justify-center text-normal font-normal cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98]"
+                className="py-6 flex-1 w-full border border-[#EA8B49] text-[#EA8B49] hover:bg-orange-50 rounded-md px-8 h-12 flex items-center justify-center text-normal font-normal cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                 Demander une démo
               </Link>
@@ -69,11 +69,6 @@ export const Hero = () => {
               />
               <div className="absolute inset-0 bg-black/5 pointer-events-none" />
             </div>
-          </div>
-
-          {/* Framer badge style decorative element */}
-          <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur shadow-sm border border-gray-100 px-3 py-1 rounded-full text-[10px] font-medium text-gray-400">
-            Made in Framer
           </div>
         </motion.div>
       </div>

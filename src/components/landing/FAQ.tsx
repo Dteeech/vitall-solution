@@ -69,10 +69,10 @@ export const FAQ = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="#trial"
+                href="/account-setup"
                 className="bg-[#132E49] hover:bg-[#1a3e61] text-white font-medium h-12 px-8 rounded-lg shadow-sm flex items-center justify-center cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
-                Se connecter / créer un compte
+                En savoir plus
               </Link>
               <Link
                 href="#demo"

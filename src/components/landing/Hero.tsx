@@ -35,10 +35,10 @@ export const Hero = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
-                href="#trial"
+                href="/account-setup"
                 className="py-6 flex-1 w-full bg-[#132E49] hover:bg-[#1a3e61] text-white rounded-md px-8 h-12 flex items-center justify-center text-normal font-normal cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
-                Se connecter / créer un compte
+                Mon compte
               </Link>
               <Link
                 href="#demo"

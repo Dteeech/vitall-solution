@@ -1,0 +1,358 @@
+"use client"
+
+import Link from 'next/link'
+import Image from 'next/image'
+import { Button } from '@/components/ui/button'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import { CheckCircle2, Calendar, Users, ClipboardList, ChevronRight, Star } from 'lucide-react'
+
+const faqItems = [
+  {
+    id: "item-1",
+    question: "À qui s'adresse Vitall ?",
+    answer: "Vitall est conçu pour les services d'urgence et de secours, notamment les SDIS (Services Départementaux d'Incendie et de Secours), les sapeurs-pompiers, et toute structure nécessitant une gestion optimisée des plannings, des ressources humaines et de la conformité."
+  },
+  {
+    id: "item-2",
+    question: "Est-ce que Vitall est compatible avec nos systèmes existants ?",
+    answer: "Oui, Vitall est conçu pour s'intégrer avec vos outils existants. Notre plateforme offre une interopérabilité complète et peut se connecter à vos systèmes de gestion actuels grâce à nos API ouvertes."
+  },
+  {
+    id: "item-3",
+    question: "Comment sont sécurisées nos données ?",
+    answer: "La sécurité est notre priorité. Vos données sont hébergées en France, chiffrées de bout en bout, et nous respectons les normes les plus strictes en matière de protection des données de santé et de sécurité."
+  },
+  {
+    id: "item-4",
+    question: "Quel accompagnement proposez-vous ?",
+    answer: "Nous proposons un accompagnement complet : formation de vos équipes, support technique réactif, et un interlocuteur dédié pour garantir le succès du déploiement de Vitall dans votre structure."
+  },
+]
+
+export default function LandingPage() {
+  return (
+    <div className="flex min-h-screen flex-col bg-white font-sans overflow-x-hidden">
+      {/* Header */}
+      <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-7xl bg-white/80 backdrop-blur-md border border-gray-100 shadow-sm rounded-full">
+        <div className="container mx-auto flex items-center justify-between px-6 py-3">
+          <Link href="/" className="flex items-center gap-2">
+            <Image
+              src="/assets/images/logo-hompepage.avif"
+              alt="Vitall Logo"
+              width={100}
+              height={32}
+              className="h-8 w-auto"
+            />
+          </Link>
+          <nav className="hidden md:flex items-center gap-8">
+            <Link href="#modules" className="text-sm font-medium text-[#475569] hover:text-black transition-colors">
+              Modules
+            </Link>
+            <Link href="#features" className="text-sm font-medium text-[#475569] hover:text-black transition-colors">
+              Métiers
+            </Link>
+            <Link href="#faq" className="text-sm font-medium text-[#475569] hover:text-black transition-colors">
+              FAQ
+            </Link>
+            <Link href="#contact" className="text-sm font-medium text-[#475569] hover:text-black transition-colors">
+              Contact
+            </Link>
+          </nav>
+          <div className="flex items-center gap-3">
+            <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex text-gray-700 hover:bg-gray-100 rounded-full">
+              <Link href="/login">Connexion</Link>
+            </Button>
+            <Button asChild size="sm" className="bg-[#0F172A] hover:bg-[#1E293B] text-white rounded-full px-6">
+              <Link href="/account-setup">Essayer gratuitement</Link>
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      <main className="flex-1">
+        {/* Hero Section */}
+        <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
+          <div className="container mx-auto px-4 relative z-10 text-center">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EFF6FF] border border-blue-100 text-[#2563EB] text-xs font-medium mb-6">
+              <Star className="w-3 h-3 fill-current" />
+              <span>La solution n°1 pour les services de secours</span>
+            </div>
+            <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-[#0F172A] mb-8 max-w-4xl mx-auto leading-tight">
+              Alléger le quotidien de ceux qui veillent sur le nôtre
+            </h1>
+            <p className="text-lg md:text-xl text-[#475569] mb-10 max-w-2xl mx-auto leading-relaxed">
+              La plateforme tout-en-un pour optimiser vos ressources, simplifier vos plannings et renforcer l'efficacité de vos équipes sur le terrain.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+              <Button asChild size="lg" className="bg-[#0F172A] hover:bg-[#1E293B] text-white rounded-full px-8 h-14 text-base font-semibold w-full sm:w-auto">
+                <Link href="/account-setup">
+                  Obtenir un essai gratuit
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="bg-white border-gray-200 text-[#0F172A] hover:bg-gray-50 rounded-full px-8 h-14 text-base font-semibold w-full sm:w-auto">
+                <Link href="/login">
+                  Demander une démo
+                </Link>
+              </Button>
+            </div>
+
+            {/* Mockup Preview */}
+            <div className="relative max-w-6xl mx-auto">
+              <div className="rounded-2xl border border-gray-200 bg-white shadow-2xl overflow-hidden aspect-video relative group border-blue-100">
+                {/* Simulated browser UI */}
+                <div className="h-10 bg-gray-50 border-b border-gray-100 flex items-center px-4 gap-2">
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-red-400" />
+                    <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                    <div className="w-3 h-3 rounded-full bg-green-400" />
+                  </div>
+                  <div className="mx-auto w-1/3 h-5 bg-white border border-gray-200 rounded-md" />
+                </div>
+                <div className="absolute inset-0 top-10 flex items-center justify-center bg-gray-50">
+                   <video
+                    src="/assets/videos/video-presentation-vitall.webm"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="object-cover w-full h-full"
+                  />
+                  {/* Play Button Overlay */}
+                  <div className="absolute inset-0 bg-[#0F172A]/5 flex items-center justify-center group-hover:bg-[#0F172A]/0 transition-colors pointer-events-none">
+                    <div className="w-16 h-16 bg-white rounded-full shadow-xl flex items-center justify-center transform transition-all group-hover:scale-110">
+                      <div className="w-0 h-0 border-t-[10px] border-t-transparent border-l-[15px] border-l-black border-b-[10px] border-b-transparent ml-1" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Decorative elements */}
+              <div className="absolute -z-10 -top-20 -left-20 w-64 h-64 bg-blue-100 rounded-full blur-3xl opacity-50" />
+              <div className="absolute -z-10 -bottom-20 -right-20 w-80 h-80 bg-purple-100 rounded-full blur-3xl opacity-50" />
+            </div>
+          </div>
+        </section>
+
+        {/* Logos/Trust Section */}
+        <section className="py-12 border-y border-gray-100 bg-white">
+          <div className="container mx-auto px-4">
+            <p className="text-center text-sm font-medium text-gray-400 uppercase tracking-widest mb-8">
+              Ils nous font confiance
+            </p>
+            <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
+              <div className="h-8 md:h-10 w-32 bg-gray-200 rounded animate-pulse" />
+              <div className="h-8 md:h-10 w-32 bg-gray-200 rounded animate-pulse" />
+              <div className="h-8 md:h-10 w-32 bg-gray-200 rounded animate-pulse" />
+              <div className="h-8 md:h-10 w-32 bg-gray-200 rounded animate-pulse" />
+            </div>
+          </div>
+        </section>
+
+        {/* Modules Section */}
+        <section id="modules" className="py-20 md:py-28 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-16">
+              <div className="max-w-2xl">
+                <span className="text-[#2563EB] font-semibold text-sm tracking-wider uppercase mb-4 block">Modules</span>
+                <h2 className="text-4xl md:text-5xl font-bold text-[#0F172A] mb-6">
+                  Des modules adaptés à vos besoins
+                </h2>
+                <p className="text-lg text-[#475569]">
+                  Composez votre solution idéale avec nos modules à la carte. Choisissez uniquement ce dont vous avez besoin.
+                </p>
+              </div>
+              <Button variant="outline" className="rounded-full px-6 border-gray-200 hover:bg-gray-50">
+                Voir tous les modules
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                {
+                  title: "Gestion RH & Compétences",
+                  description: "Centralisez le suivi des carrières, des aptitudes et des habilitations de tous vos agents.",
+                  icon: <Users className="w-6 h-6 text-[#2563EB]" />,
+                  color: "bg-[#EFF6FF]"
+                },
+                {
+                  title: "Planning & Disponibilités",
+                  description: "Gérez les plannings complexes et les tours de garde avec une flexibilité totale.",
+                  icon: <Calendar className="w-6 h-6 text-green-600" />,
+                  color: "bg-green-50"
+                },
+                {
+                  title: "Recrutement Simplifié",
+                  description: "Enfin un outil de recrutement qui parle votre langue et comprend vos enjeux opérationnels.",
+                  icon: <ClipboardList className="w-6 h-6 text-purple-600" />,
+                  color: "bg-purple-50"
+                }
+              ].map((module, i) => (
+                <div key={i} className="group p-8 rounded-3xl border border-gray-100 bg-white hover:border-blue-100 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300">
+                  <div className={`w-14 h-14 rounded-2xl ${module.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
+                    {module.icon}
+                  </div>
+                  <h3 className="text-xl font-bold text-[#0F172A] mb-3">{module.title}</h3>
+                  <p className="text-[#475569] mb-6 leading-relaxed">
+                    {module.description}
+                  </p>
+                  <Link href="#" className="inline-flex items-center text-sm font-semibold text-[#0F172A] group-hover:text-[#2563EB] transition-colors">
+                    En savoir plus <ChevronRight className="ml-1 w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Feature Section with Image */}
+        <section id="features" className="py-24 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              <div>
+                <span className="text-[#2563EB] font-semibold text-sm tracking-wider uppercase mb-4 block">Efficacité</span>
+                <h2 className="text-4xl md:text-5xl font-bold text-[#0F172A] mb-8 leading-tight">
+                  L'organisation collective simplifiée
+                </h2>
+                <div className="space-y-6">
+                  {[
+                    "Visibilité instantanée sur l'agenda des collaborateurs",
+                    "Alerte automatique sur les péremptions d'aptitudes",
+                    "Interface optimisée pour une saisie rapide sur le terrain",
+                    "Reporting automatique pour l'analyse opérationnelle"
+                  ].map((item, i) => (
+                    <div key={i} className="flex gap-4">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center mt-1">
+                        <CheckCircle2 className="w-4 h-4 text-[#2563EB]" />
+                      </div>
+                      <p className="text-lg text-gray-700">{item}</p>
+                    </div>
+                  ))}
+                </div>
+                <Button asChild size="lg" className="mt-10 bg-[#0F172A] hover:bg-[#1E293B] text-white rounded-full px-8 h-12">
+                  <Link href="/account-setup">Découvrir la solution</Link>
+                </Button>
+              </div>
+              <div className="relative">
+                <div className="rounded-3xl border border-gray-200 shadow-2xl overflow-hidden shadow-blue-500/10 transform rotate-1 transition-transform hover:rotate-0 duration-500">
+                  <Image 
+                    src="/assets/images/pompier-incendie.webp" 
+                    alt="Feature Image" 
+                    width={800} 
+                    height={600}
+                    className="object-cover w-full h-full"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section id="faq" className="py-20 md:py-28 bg-white">
+          <div className="container mx-auto px-4 max-w-4xl">
+            <div className="text-center mb-16">
+              <span className="text-[#2563EB] font-semibold text-sm tracking-wider uppercase mb-4 block">FAQ</span>
+              <h2 className="text-4xl font-bold text-[#0F172A] mb-6">
+                Vous avez une question ?
+              </h2>
+              <p className="text-lg text-[#475569] max-w-2xl mx-auto">
+                Retrouvez les réponses aux questions les plus fréquentes posées par nos utilisateurs.
+              </p>
+            </div>
+            <Accordion type="single" collapsible className="w-full space-y-4">
+              {faqItems.map((item) => (
+                <AccordionItem key={item.id} value={item.id} className="border border-gray-100 rounded-2xl px-6 bg-gray-50/50 hover:bg-gray-50 transition-colors">
+                  <AccordionTrigger className="text-left font-semibold text-[#0F172A] hover:no-underline py-5 text-lg">
+                    {item.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-[#475569] pb-5 leading-relaxed text-base">
+                    {item.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section id="contact" className="py-24 px-4 overflow-hidden">
+          <div className="container mx-auto max-w-6xl">
+            <div className="bg-[#0F172A] rounded-[32px] p-8 md:p-20 text-center relative">
+              {/* Background gradient effects */}
+              <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-blue-600/20 to-transparent pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-1/2 h-full bg-gradient-to-r from-purple-600/20 to-transparent pointer-events-none" />
+              
+              <div className="relative z-10">
+                <h2 className="text-4xl md:text-6xl font-bold text-white mb-8 leading-tight">
+                  Prenez le contrôle de<br className="hidden md:block" /> votre organisation dès aujourd'hui
+                </h2>
+                <p className="text-gray-400 text-lg md:text-xl mb-12 max-w-2xl mx-auto">
+                  Rejoignez les services de secours qui ont déjà modernisé leur fonctionnement avec Vitall.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                  <Button asChild size="lg" className="bg-white text-black hover:bg-gray-100 rounded-full px-10 h-14 text-base font-bold w-full sm:w-auto">
+                    <Link href="/account-setup">Débuter l'essai gratuit</Link>
+                  </Button>
+                  <Button asChild variant="outline" size="lg" className="border-white/20 text-white hover:bg-white/10 rounded-full px-10 h-14 text-base font-bold w-full sm:w-auto backdrop-blur-sm">
+                    <Link href="/login">Demander une démo</Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-100 pt-20 pb-10">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+            <div className="space-y-6">
+              <Image
+                src="/assets/images/Logo-couleur.svg"
+                alt="Vitall Logo"
+                width={100}
+                height={32}
+                className="h-8 w-auto"
+              />
+              <p className="text-gray-500 leading-relaxed max-w-xs">
+                Alléger le quotidien de ceux qui veillent sur le nôtre avec une solution de gestion innovante et performante.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-bold text-[#0F172A] mb-6">Produit</h4>
+              <ul className="space-y-4">
+                <li><Link href="#modules" className="text-gray-500 hover:text-black transition-colors">Modules</Link></li>
+                <li><Link href="#features" className="text-gray-500 hover:text-black transition-colors">Métiers</Link></li>
+                <li><Link href="#" className="text-gray-500 hover:text-black transition-colors">Tarifs</Link></li>
+                <li><Link href="#faq" className="text-gray-500 hover:text-black transition-colors">FAQ</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-bold text-[#0F172A] mb-6 text-base">Société</h3>
+              <ul className="space-y-4">
+                <li><Link href="#" className="text-gray-500 hover:text-black transition-colors">Qui sommes nous ?</Link></li>
+                <li><Link href="#" className="text-gray-500 hover:text-black transition-colors">Contact</Link></li>
+                <li><Link href="#" className="text-gray-500 hover:text-black transition-colors">Blog</Link></li>
+                <li><Link href="#" className="text-gray-500 hover:text-black transition-colors">Recrutement</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-bold text-[#0F172A] mb-6 text-base">Légal</h3>
+              <ul className="space-y-4">
+                <li><Link href="/mentions-legales" className="text-gray-500 hover:text-black transition-colors">Mentions légales</Link></li>
+                <li><Link href="#" className="text-gray-500 hover:text-black transition-colors">Confidentialité</Link></li>
+                <li><Link href="#" className="text-gray-500 hover:text-black transition-colors">Cookies</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-gray-400 text-sm">
+              © {new Date().getFullYear()} Vitall. Tous droits réservés.
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  )
+}

@@ -19,8 +19,8 @@ const faqItems = [
     a: "Vitall est conçu pour les services d’intervention, les structures de secours et les organisations qui doivent coordonner des équipes et des ressources sur le terrain."
   },
   {
-    q: "Peut-on personnaliser les modules de l’Logiciel de gestion sur mesure ?",
-    a: "Oui. Les modules permettent de construire un Logiciel de gestion sur mesure adapté aux besoins spécifiques de votre structure."
+    q: "Peut-on personnaliser les modules de logiciel de gestion sur mesure ?",
+    a: "Oui. Les modules permettent de construire un lde gestion sur mesure adapté aux besoins spécifiques de votre structure."
   },
 ]
 

@@ -28,9 +28,9 @@ export const Hero = () => {
 
           <div className="lg:max-w-md w-full">
             <p className="text-gray-500 mb-8 text-lg">
-              Vitall, l’Logiciel de gestion sur mesure conçu pour les structures d’intervention.
+              Vitall, logiciel de gestion sur mesure conçu pour les structures d’intervention.
               La plateforme centralise la gestion des équipes, des ressources et des opérations dans un seul outil.
-              Un Logiciel de gestion sur mesure conçu pour simplifier l’organisation et améliorer l’efficacité des équipes sur le terrain.
+              Un logiciel de gestion sur mesure conçu pour simplifier l’organisation et améliorer l’efficacité des équipes sur le terrain.
 
             </p>
             <div className="flex flex-col sm:flex-row gap-4">

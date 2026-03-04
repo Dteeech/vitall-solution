@@ -5,12 +5,13 @@ import Image from 'next/image'
 
 interface AlternatingSectionProps {
   title: string
+  imageUrl: string
   description: string
   items: string[]
   reverse?: boolean
 }
 
-export const AlternatingSection = ({ title, description, items, reverse = false }: AlternatingSectionProps) => {
+export const AlternatingSection = ({ title, imageUrl, description, items, reverse = false }: AlternatingSectionProps) => {
   return (
     <section className="py-24 bg-white">
       <div className="container mx-auto px-6 max-w-6xl">
@@ -24,7 +25,7 @@ export const AlternatingSection = ({ title, description, items, reverse = false 
           >
             <div className="aspect-[4/3] rounded-3xl bg-[#f8fafc] border border-gray-100 shadow-lg overflow-hidden relative">
               <Image
-                src="/assets/images/pompier-dos.avif"
+                src={imageUrl}
                 alt={title}
                 fill
                 className="object-cover"

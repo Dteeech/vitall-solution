@@ -21,7 +21,7 @@ export const Hero = () => {
           className="flex flex-col lg:flex-row items-center lg:items-end justify-between gap-12 mb-16"
         >
           <div className="lg:max-w-2xl text-left">
-            <h1 className="text-5xl md:text-7xl font-normal tracking-tight text-[#132E49] leading-[1.1]">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-normal tracking-tight text-[#132E49] leading-[1.1]">
               Alléger le quotidien de ceux qui veillent sur le nôtre
             </h1>
           </div>

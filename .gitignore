@@ -51,5 +51,6 @@ prisma/migrations/*_init_local/
 #Hot reload pour le développement
 docker-compose.override.yml
 
-# AI guidelines (local only)
+# AI guidelines and skills(local only)
 AI_GUIDELINES.md
+skills/

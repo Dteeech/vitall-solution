@@ -71,11 +71,11 @@ export const MODULE_REGISTRY: Record<string, ModuleDefinition> = {
     description:
       "Optimisez vos processus de recrutement, du sourcing à l'onboarding, avec une interface intuitive et collaborative.",
     adminRoutes: [
-      { title: "Candidatures", href: "/admin/modules/recruit-firefighter/candidates" },
+      { title: "Candidatures", href: "/admin/recrutement/candidates" },
       { title: "Casernes", href: "/admin/casernes" },
       { title: "Transfert", href: "/admin/transfert" },
       { title: "Ma caserne", href: "/admin/ma-caserne" },
-      { title: "Données analytiques", href: "/admin/analytics" },
+      { title: "Données analytiques", href: "/admin/recrutement/analytics" },
     ],
     userRoutes: [
       { title: "Dossier", href: "/dashboard/candidature/dossier" },

@@ -5,7 +5,7 @@ import { processSuccessfulCheckout } from "@/lib/registration"
 import { withMetrics } from "@/lib/withMetrics"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2026-01-28.clover",
+  apiVersion: "2026-02-25.clover",
 })
 
 export const GET = withMetrics(async function GET(request: Request) {
@@ -45,7 +45,7 @@ export const GET = withMetrics(async function GET(request: Request) {
     if (!user && session.payment_status === "paid" && session.status === "complete") {
       console.log(`Utilisateur ${email} non trouvé, création via API fallback...`)
       const result = await processSuccessfulCheckout(session)
-      
+
       // On recharge l'utilisateur avec l'organisation
       user = await prisma.user.findUnique({
         where: { email },

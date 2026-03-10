@@ -5,7 +5,7 @@ import { processSuccessfulCheckout } from "@/lib/registration"
 import { withMetrics } from "@/lib/withMetrics"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2026-01-28.clover",
+  apiVersion: "2026-02-25.clover",
 })
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
@@ -31,7 +31,7 @@ export const POST = withMetrics(async function POST(request: Request) {
     // Gérer l'événement de paiement réussi
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session
-      
+
       const result = await processSuccessfulCheckout(session)
 
       console.log(`✅ Webhook: Compte traité pour ${result.user.email}`)

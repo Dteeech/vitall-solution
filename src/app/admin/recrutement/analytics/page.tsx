@@ -53,7 +53,7 @@ function KPICard({ value, label, bgColor, iconBgColor, Icon, loading }: KPICardD
         <Icon className="w-6 h-6 text-white" />
       </div>
       {label === "Nouvelles candidatures" && (
-        <Link className='absolute top-0 right-4 mt-6 inline-flex items-center justify-center gap-2 px-6 py-2 bg-primary-500/20 group-hover:bg-primary-500 text-primary-900 group-hover:text-white font-semibold text-lg rounded-xl transition-colors duration-200 z-10 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto' href="/admin/modules/recrutement/candidates">
+        <Link className='absolute top-0 right-4 mt-6 inline-flex items-center justify-center gap-2 px-6 py-2 bg-primary-500/20 group-hover:bg-primary-500 text-primary-900 group-hover:text-white font-semibold text-lg rounded-xl transition-colors duration-200 z-10 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto' href="/admin/recrutement/candidates">
           + Voir
         </Link>
       )}

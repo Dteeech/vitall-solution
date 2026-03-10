@@ -14,7 +14,7 @@
   "routes": {
     "admin": [
       "/admin/modules/recrutement",
-      "/admin/modules/recrutement/candidates"
+      "/admin/recrutement/candidates"
     ],
     "user": [
       "/dashboard/candidature/dossier",

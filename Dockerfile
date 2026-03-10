@@ -1,8 +1,9 @@
 # ====================================
 # Stage 1: Builder
 # ====================================
-FROM node:20-alpine AS builder
-
+FROM node:24-alpine AS builder
+# Patch zlib vulnerability
+RUN apk upgrade --no-cache zlib
 # Mise à jour de npm pour corriger les vulnérabilités de sécurité
 RUN npm install -g npm@11.6.4
 

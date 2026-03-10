@@ -10,10 +10,10 @@ type Props = {
 
 export function RecruiterIdentityCard({ recruiter }: Props) {
   const recruiterInfoRows = [
-    { label: "Nom", value: recruiter.lastName },
-    { label: "Prénom", value: recruiter.firstName },
-    { label: "Adresse email", value: recruiter.email },
-    { label: "Caserne", value: recruiter.caserne },
+    { label: "Nom", value: recruiter.lastName || "-" },
+    { label: "Prénom", value: recruiter.firstName || "-" },
+    { label: "Adresse email", value: recruiter.email || "-" },
+    { label: "Caserne", value: recruiter.caserne || "-" },
   ]
 
   return (

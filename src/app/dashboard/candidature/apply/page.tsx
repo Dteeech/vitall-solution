@@ -2,8 +2,9 @@
 
 import { useState } from "react"
 import { Card } from "@/components/ui/Card"
+import { Progress } from "@/components/ui/progress"
 import { Check, ChevronRight, ChevronLeft, Upload, MapPin, Search, FileText, CheckCircle2 } from "lucide-react"
-import { Progress } from "@/components/ui/shadcn-io/progress"
+
 
 const STEPS = [
   "Vos informations",
@@ -36,15 +37,7 @@ export default function CandidateApplyPage() {
             </div>
           </div>
 
-          <div className="flex gap-2">
-            {STEPS.map((_, i) => (
-              <div
-                key={i}
-                className={`h-2 flex-1 rounded-full transition-all duration-300 ${i + 1 <= currentStep ? 'bg-[#132E49]' : 'bg-gray-200'
-                  }`}
-              />
-            ))}
-          </div>
+          <Progress value={(currentStep / 7) * 100} className="h-2 mb-12" />
         </div>
 
         {/* Step Content */}

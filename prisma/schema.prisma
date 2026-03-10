@@ -23,15 +23,17 @@ model User {
 }
 
 model Organization {
-  id           String        @id @default(uuid())
-  name         String
-  address      String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  candidatures Candidature[]
-  plannings    Planning[]
-  subscription Subscription?
-  users        User[]
+  id              String        @id @default(uuid())
+  name            String
+  address         String?
+  recruitmentOpen Boolean       @default(false)
+  openPositions   Int           @default(0)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  candidatures    Candidature[]
+  plannings       Planning[]
+  subscription    Subscription?
+  users           User[]
 }
 
 model Module {

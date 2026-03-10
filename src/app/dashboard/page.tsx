@@ -2,7 +2,8 @@
 
 import { Card } from "@/components/ui/Card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Progress } from "@/components/ui/shadcn-io/progress" // Assuming shadcn progress or similar
+
+import { Progress } from "@/components/ui/progress"
 import { Mail, MapPin, FileIcon, CheckCircle2, Clock } from "lucide-react"
 
 export default function DashboardUserPage() {
@@ -32,7 +33,15 @@ export default function DashboardUserPage() {
         {/* Left Column - Application Tracking */}
         <div className="lg:col-span-2 space-y-8">
           <Card className="p-6 border-none shadow-sm rounded-3xl">
-            <h2 className="text-lg font-bold text-[#132E49] mb-6">Suivi de candidature</h2>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-bold text-[#132E49]">Suivi de candidature</h2>
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-bold text-[#132E49]">Phase 3/6</span>
+                <div className="w-32">
+                  <Progress value={50} className="h-2" />
+                </div>
+              </div>
+            </div>
             <div className="relative space-y-6">
               {/* Vertical line connector */}
               <div className="absolute left-[11px] top-2 bottom-2 w-0.5 bg-gray-100" />
@@ -40,8 +49,8 @@ export default function DashboardUserPage() {
               {applicationSteps.map((step, idx) => (
                 <div key={idx} className="flex gap-4 relative">
                   <div className={`z-10 w-6 h-6 rounded-half flex items-center justify-center ${step.status === 'completed' ? 'bg-[#132E49] text-white' :
-                      step.status === 'current' ? 'bg-orange-100 text-[#EA8B48] border-2 border-[#EA8B48]' :
-                        'bg-white border-2 border-gray-200'
+                    step.status === 'current' ? 'bg-orange-100 text-[#EA8B48] border-2 border-[#EA8B48]' :
+                      'bg-white border-2 border-gray-200'
                     }`}>
                     {step.status === 'completed' ? <CheckCircle2 size={14} /> :
                       step.status === 'current' ? <Clock size={14} /> : null}

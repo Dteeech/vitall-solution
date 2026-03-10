@@ -1,6 +1,6 @@
 "use client"
 
-import { Card } from "@/components/ui/Card"
+import { useAuth } from '@/context/AuthContext'
 import {
   FileIcon,
   Download,
@@ -9,11 +9,21 @@ import {
   AtSign,
   Briefcase,
   Calendar,
-  FileText
+  FileText,
+  Loader2
 } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export default function DossierPage() {
+  const { user, loading } = useAuth()
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center min-h-screen">
+        <Loader2 className="size-8 animate-spin text-orange-500" />
+      </div>
+    )
+  }
+
   const sections = [
     {
       title: "Vos résultats",
@@ -52,12 +62,14 @@ export default function DossierPage() {
   ]
 
   const userInfo = [
-    { icon: Cake, label: "Âge", value: "12/05/1995" },
-    { icon: MapPin, label: "Adresse", value: "Saint-Herblain" },
-    { icon: AtSign, label: "Email", value: "matinleo@mail.com" },
-    { icon: Briefcase, label: "Métier", value: "Plombier" },
-    { icon: Calendar, label: "Candidature", value: "05/09/2025" },
+    { icon: Cake, label: "Âge", value: "Non renseigné" },
+    { icon: MapPin, label: "Adresse", value: user?.organization?.name || "Non renseignée" },
+    { icon: AtSign, label: "Email", value: user?.email || "-" },
+    { icon: Briefcase, label: "Métier", value: "Candidat" },
+    { icon: Calendar, label: "Candidature", value: "En cours" },
   ]
+
+  const initials = (user?.firstName?.[0] || "") + (user?.lastName?.[0] || "")
 
   return (
     <div className="min-h-screen bg-white p-8">
@@ -68,16 +80,18 @@ export default function DossierPage() {
           {/* Profile Avatar */}
           <div className="relative">
             <div className="w-32 h-32 rounded-full overflow-hidden bg-[#7195AA]/60 flex items-center justify-center border-4 border-white shadow-sm">
-              <span className="text-4xl font-bold text-white">ML</span>
+              <span className="text-4xl font-bold text-white">{initials || '??'}</span>
             </div>
           </div>
 
           {/* Profile Info */}
           <div className="flex-1">
             <div className="flex items-center gap-4 mb-6">
-              <h2 className="text-2xl font-bold text-[#132E49]">Martin Léo</h2>
+              <h2 className="text-2xl font-bold text-[#132E49]">
+                {user?.firstName} {user?.lastName}
+              </h2>
               <span className="px-3 py-1 bg-[#D3E1EB] text-[#132E49] text-xs font-bold rounded-md">
-                Visite médicale à faire
+                Dossier actif
               </span>
             </div>
 

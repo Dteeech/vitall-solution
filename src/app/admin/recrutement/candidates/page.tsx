@@ -124,21 +124,19 @@ export default function CandidatesList() {
           <div className="flex gap-2">
             <button
               onClick={() => setViewMode("list")}
-              className={`p-2 rounded-md transition-colors ${
-                viewMode === "list"
-                  ? "bg-secondary-900 text-white"
-                  : "bg-white text-neutral-600 hover:bg-neutral-100"
-              }`}
+              className={`p-2 rounded-md transition-colors ${viewMode === "list"
+                ? "bg-secondary-900 text-white"
+                : "bg-white text-neutral-600 hover:bg-neutral-100"
+                }`}
             >
               <List className="size-5" />
             </button>
             <button
               onClick={() => setViewMode("grid")}
-              className={`p-2 rounded-md transition-colors ${
-                viewMode === "grid"
-                  ? "bg-secondary-900 text-white"
-                  : "bg-white text-neutral-600 hover:bg-neutral-100"
-              }`}
+              className={`p-2 rounded-md transition-colors ${viewMode === "grid"
+                ? "bg-secondary-900 text-white"
+                : "bg-white text-neutral-600 hover:bg-neutral-100"
+                }`}
             >
               <LayoutGrid className="size-5" />
             </button>
@@ -150,59 +148,59 @@ export default function CandidatesList() {
         /* Table View */
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-          <table className="w-full min-w-[800px]">
-            <thead className="bg-neutral-50 border-b">
-              <tr>
-                <th className="w-12 p-4">
-                  <input
-                    type="checkbox"
-                    checked={selectedCandidates.length === candidates.length}
-                    onChange={toggleAll}
-                    className="w-4 h-4 rounded border-neutral-300"
-                  />
-                </th>
-                <th className="text-left p-4 text-sm font-medium text-neutral-700">Candidat</th>
-                <th className="text-left p-4 text-sm font-medium text-neutral-700">Statut</th>
-                <th className="text-left p-4 text-sm font-medium text-neutral-700">Date de candidature</th>
-                <th className="text-left p-4 text-sm font-medium text-neutral-700">Localisation</th>
-                <th className="text-left p-4 text-sm font-medium text-neutral-700">Documents</th>
-              </tr>
-            </thead>
-            <tbody>
-              {candidates.map((candidate: Candidate) => (
-                <tr key={candidate.id} className="border-b hover:bg-neutral-50 transition-colors">
-                  <td className="p-4">
+            <table className="w-full min-w-[800px]">
+              <thead className="bg-neutral-50 border-b">
+                <tr>
+                  <th className="w-12 p-4">
                     <input
                       type="checkbox"
-                      checked={selectedCandidates.includes(candidate.id)}
-                      onChange={() => toggleCandidate(candidate.id)}
+                      checked={selectedCandidates.length === candidates.length}
+                      onChange={toggleAll}
                       className="w-4 h-4 rounded border-neutral-300"
                     />
-                  </td>
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="size-8 rounded-full bg-secondary-900 flex items-center justify-center text-white text-sm font-medium">
-                        {candidate.name.split(" ").map((n: string) => n[0]).join("")}
-                      </div>
-                      <span className="text-sm font-medium text-neutral-900">{candidate.name}</span>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <span
-                      className={`inline-flex px-3 py-1 rounded-md text-xs font-medium ${getStatusBadgeColor(
-                        candidate.status
-                      )}`}
-                    >
-                      {candidate.status}
-                    </span>
-                  </td>
-                  <td className="p-4 text-sm text-neutral-700">{candidate.date}</td>
-                  <td className="p-4 text-sm text-neutral-700">{candidate.location}</td>
-                  <td className="p-4 text-sm text-neutral-700">{candidate.documents}</td>
+                  </th>
+                  <th className="text-left p-4 text-sm font-medium text-neutral-700">Candidat</th>
+                  <th className="text-left p-4 text-sm font-medium text-neutral-700">Statut</th>
+                  <th className="text-left p-4 text-sm font-medium text-neutral-700">Date de candidature</th>
+                  <th className="text-left p-4 text-sm font-medium text-neutral-700">Localisation</th>
+                  <th className="text-left p-4 text-sm font-medium text-neutral-700">Documents</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {candidates.map((candidate: Candidate) => (
+                  <tr key={candidate.id} className="border-b hover:bg-neutral-50 transition-colors">
+                    <td className="p-4">
+                      <input
+                        type="checkbox"
+                        checked={selectedCandidates.includes(candidate.id)}
+                        onChange={() => toggleCandidate(candidate.id)}
+                        className="w-4 h-4 rounded border-neutral-300"
+                      />
+                    </td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="size-8 rounded-full bg-secondary-900 flex items-center justify-center text-white text-sm font-medium">
+                          {candidate.name.split(" ").map((n: string) => n[0]).join("")}
+                        </div>
+                        <span className="text-sm font-medium text-neutral-900">{candidate.name}</span>
+                      </div>
+                    </td>
+                    <td className="p-4">
+                      <span
+                        className={`inline-flex px-3 py-1 rounded-md text-xs font-medium ${getStatusBadgeColor(
+                          candidate.status
+                        )}`}
+                      >
+                        {candidate.status}
+                      </span>
+                    </td>
+                    <td className="p-4 text-sm text-neutral-700">{candidate.date}</td>
+                    <td className="p-4 text-sm text-neutral-700">{candidate.location}</td>
+                    <td className="p-4 text-sm text-neutral-700">{candidate.documents}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       ) : (
@@ -284,8 +282,8 @@ function CandidateCard({
 
   const style = transform
     ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-      }
+      transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+    }
     : undefined
 
   return (
@@ -294,9 +292,8 @@ function CandidateCard({
       style={style}
       {...listeners}
       {...attributes}
-      className={`bg-white border border-neutral-200 rounded-lg p-4 cursor-grab active:cursor-grabbing transition-shadow ${
-        isDragging ? "shadow-xl opacity-50" : "hover:shadow-md"
-      }`}
+      className={`bg-white border border-neutral-200 rounded-lg p-4 cursor-grab active:cursor-grabbing transition-shadow ${isDragging ? "shadow-xl opacity-50" : "hover:shadow-md"
+        }`}
     >
       {/* Avatar + Name */}
       <div className="flex items-center gap-3 mb-2">

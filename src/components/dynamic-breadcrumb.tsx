@@ -21,7 +21,7 @@ export function DynamicBreadcrumb() {
     dashboard: "Dashboard",
     admin: "Administration",
     modules: "Modules",
-    "recruit-firefighter": "Recrutement",
+    "recrutement": "Recrutement",
     candidates: "Candidats",
   }
 

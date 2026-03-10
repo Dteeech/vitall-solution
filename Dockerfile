@@ -31,7 +31,7 @@ RUN npm run build
 # ====================================
 # Stage 2: Runner (Production)
 # ====================================
-FROM node:20-alpine AS runner
+FROM node:20.20.1-alpine3.22 AS runner
 
 RUN apk add --no-cache openssl
 

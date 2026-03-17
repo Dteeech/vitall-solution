@@ -56,9 +56,12 @@ async function main() {
   });
   console.log(`Upserted organization: ${organizationAdmin.name}`);
 
-  // Hash des mots de passe depuis les variables d'environnement
-  const adminPassword = process.env.SEED_ADMIN_PASSWORD || 'password123';
-  const hashedAdminPassword = await bcrypt.hash(adminPassword, 10);
+  // Hash des mots de passe (hashSync pour compatibilité container)
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD || 'Admin1234!';
+  const hashedAdminPassword = bcrypt.hashSync(adminPassword, 10);
+
+  const userPassword = process.env.SEED_USER_PASSWORD || 'User1234!';
+  const hashedUserPassword = bcrypt.hashSync(userPassword, 10);
 
   // Création Admin
   const admin = await prisma.user.upsert({
@@ -81,17 +84,41 @@ async function main() {
   });
   console.log(`Upserted admin user: ${admin.email}`);
 
+  // Création User
+  const user = await prisma.user.upsert({
+    where: { email: 'user@test.fr' },
+    update: {
+        password: hashedUserPassword,
+        role: 'USER',
+        firstName: 'Jean',
+        lastName: 'Dupont',
+        organizationId: organizationAdmin.id,
+    },
+    create: {
+      email: 'user@test.fr',
+      password: hashedUserPassword,
+      role: 'USER',
+      firstName: 'Jean',
+      lastName: 'Dupont',
+      organizationId: organizationAdmin.id,
+    },
+  });
+  console.log(`Upserted user: ${user.email}`);
+
   // --- SEED CANDIDATURES ---
+  // La candidature de l'user test est identifiée par son email
   const candidaturesData = [
-    { firstName: 'Jean', lastName: 'Dupont', email: 'jean.dupont@example.com', status: 'PENDING' },
+    { firstName: 'Jean', lastName: 'Dupont', email: 'user@test.fr', status: 'INTERVIEW' },
     { firstName: 'Sophie', lastName: 'Martin', email: 'sophie.martin@example.com', status: 'INTERVIEW' },
     { firstName: 'Lucas', lastName: 'Bernard', email: 'lucas.bernard@example.com', status: 'REJECTED' },
     { firstName: 'Emma', lastName: 'Petit', email: 'emma.petit@example.com', status: 'ACCEPTED' },
   ];
 
   for (const cand of candidaturesData) {
-      await prisma.candidature.create({
-          data: {
+      await prisma.candidature.upsert({
+          where: { email: cand.email },
+          update: { status: cand.status as any },
+          create: {
               firstName: cand.firstName,
               lastName: cand.lastName,
               email: cand.email,

@@ -94,7 +94,7 @@ const dayLabels = ["L", "M", "M", "J", "V", "S", "D"]
 // ═════════════════════════════════════════════════════════
 export default function AstreintesPage() {
   // ─── View ──────────────────────────────────────────────
-  const [viewMode, setViewMode] = useState<"month" | "day">("day")
+  const [viewMode, setViewMode] = useState<"month" | "day">("month")
   const [currentDate, setCurrentDate] = useState(new Date())
   const datePickerRef = useRef<HTMLInputElement>(null)
 

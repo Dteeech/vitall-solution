@@ -148,7 +148,7 @@ export default function PlanningPage() {
   }
   
   // View State (Mois / Jour)
-  const [viewMode, setViewMode] = useState<"month" | "day">("day")
+  const [viewMode, setViewMode] = useState<"month" | "day">("month")
   const [currentDate, setCurrentDate] = useState(new Date())
   
   const [shifts, setShifts] = useState<ShiftAPI[]>([])

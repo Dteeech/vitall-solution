@@ -90,16 +90,16 @@ async function main() {
     update: {
         password: hashedUserPassword,
         role: 'USER',
-        firstName: 'Jean',
-        lastName: 'Dupont',
+        firstName: 'User',
+        lastName: 'Test',
         organizationId: organizationAdmin.id,
     },
     create: {
       email: 'user@test.fr',
       password: hashedUserPassword,
       role: 'USER',
-      firstName: 'Jean',
-      lastName: 'Dupont',
+      firstName: 'User',
+      lastName: 'Test',
       organizationId: organizationAdmin.id,
     },
   });
@@ -108,7 +108,7 @@ async function main() {
   // --- SEED CANDIDATURES ---
   // La candidature de l'user test est identifiée par son email
   const candidaturesData = [
-    { firstName: 'Jean', lastName: 'Dupont', email: 'user@test.fr', status: 'INTERVIEW' },
+    { firstName: 'User', lastName: 'Test', email: 'user@test.fr', status: 'INTERVIEW' },
     { firstName: 'Sophie', lastName: 'Martin', email: 'sophie.martin@example.com', status: 'INTERVIEW' },
     { firstName: 'Lucas', lastName: 'Bernard', email: 'lucas.bernard@example.com', status: 'REJECTED' },
     { firstName: 'Emma', lastName: 'Petit', email: 'emma.petit@example.com', status: 'ACCEPTED' },

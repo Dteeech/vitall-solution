@@ -212,10 +212,12 @@ export default function DashboardUserPage() {
                     <Mail size={18} className="shrink-0" />
                     <span className="text-sm truncate">{recruiter.email}</span>
                   </div>
-                  <div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl backdrop-blur-sm">
-                    <MapPin size={18} className="shrink-0" />
-                    <span className="text-sm truncate">{orgName || "Caserne"}</span>
-                  </div>
+                  {orgName && (
+                    <div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl backdrop-blur-sm">
+                      <MapPin size={18} className="shrink-0" />
+                      <span className="text-sm truncate">{orgName}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             ) : (

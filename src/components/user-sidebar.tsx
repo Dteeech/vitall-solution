@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { LayoutDashboard, Users, Bell, Settings, LogOut, ChevronDown, ChevronRight } from "lucide-react"
+import { LayoutDashboard, Users, Bell, Settings, LogOut, ChevronDown, ChevronRight, FilePlus2 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
@@ -64,6 +64,7 @@ const FOOTER_MENU_ITEMS: MenuItem[] = [
 export function UserSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
   const router = useRouter()
+  const [hasCandidature, setHasCandidature] = React.useState<boolean | null>(null)
   const [openMenus, setOpenMenus] = React.useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {}
     MAIN_MENU_ITEMS.forEach((item) => {
@@ -76,6 +77,13 @@ export function UserSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
     })
     return initial
   })
+
+  React.useEffect(() => {
+    fetch('/api/user/candidature')
+      .then(res => res.json())
+      .then(data => setHasCandidature(data !== null && !data.error))
+      .catch(() => setHasCandidature(false))
+  }, [pathname])
 
   const toggleMenu = (title: string) => {
     setOpenMenus((prev) => ({
@@ -117,14 +125,29 @@ export function UserSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
       </SidebarHeader>
 
       <SidebarContent className="px-3">
+        {hasCandidature === false && (
+          <div className="mt-4 px-1">
+            <p className="text-white/60 text-xs mb-4 leading-relaxed group-data-[state=collapsed]:hidden">
+              Vous n&apos;avez pas encore de dossier de candidature.
+            </p>
+            <Link
+              href="/dashboard/candidature/apply"
+              className="flex items-center gap-2 w-full bg-[#EA8B48] hover:bg-[#d97b38] text-white text-sm font-semibold px-3 py-2.5 rounded-xl transition-colors group-data-[state=collapsed]:justify-center group-data-[state=collapsed]:px-2"
+            >
+              <FilePlus2 className="size-5 shrink-0" />
+              <span className="group-data-[state=collapsed]:hidden">Candidater</span>
+            </Link>
+          </div>
+        )}
         <SidebarMenu>
-          {MAIN_MENU_ITEMS.map((item) => {
+          {MAIN_MENU_ITEMS.filter(item =>
+            hasCandidature === false
+              ? item.href === '/dashboard'
+              : true
+          ).map((item) => {
             // Vérifier si l'item a des sous-menus
             if (item.subItems && item.subItems.length > 0) {
               const isOpen = openMenus[item.title] || false
-              const hasActiveSubItem = item.subItems.some(
-                (sub) => pathname === sub.href || pathname.startsWith(`${sub.href}/`)
-              )
 
               return (
                 <SidebarMenuItem key={item.title}>

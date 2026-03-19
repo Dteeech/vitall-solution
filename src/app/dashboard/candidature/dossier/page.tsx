@@ -1,6 +1,7 @@
 "use client"
 
 import { useAuth } from '@/context/AuthContext'
+import { useEffect, useState } from 'react'
 import {
   FileIcon,
   Download,
@@ -13,10 +14,40 @@ import {
   Loader2
 } from "lucide-react"
 
-export default function DossierPage() {
-  const { user, loading } = useAuth()
+type CandidatureStatus = 'PENDING' | 'INTERVIEW' | 'ACCEPTED' | 'REJECTED'
 
-  if (loading) {
+interface Candidature {
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  phone: string | null
+  status: CandidatureStatus
+  appliedAt: string
+}
+
+const STATUS_LABEL: Record<CandidatureStatus, string> = {
+  PENDING: 'En attente',
+  INTERVIEW: 'En cours',
+  ACCEPTED: 'Acceptée',
+  REJECTED: 'Rejetée',
+}
+
+export default function DossierPage() {
+  const { user, loading: authLoading } = useAuth()
+  const [candidature, setCandidature] = useState<Candidature | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!user) return
+    fetch('/api/user/candidature')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => setCandidature(data))
+      .catch(console.error)
+      .finally(() => setLoading(false))
+  }, [user])
+
+  if (authLoading || loading) {
     return (
       <div className="flex-1 flex items-center justify-center min-h-screen">
         <Loader2 className="size-8 animate-spin text-orange-500" />
@@ -24,52 +55,27 @@ export default function DossierPage() {
     )
   }
 
-  const sections = [
-    {
-      title: "Vos résultats",
-      theme: "blue",
-      items: [
-        { name: "Tests sportifs.pdf", size: "2.3 Mo" },
-        { name: "Visite médicale.pdf", size: "2.1 Mo" },
-      ]
-    },
-    {
-      title: "Documents personnels",
-      theme: "white",
-      items: [
-        { name: "Permis de conduire.pdf", size: "3 Mo" },
-        { name: "Carte d'identité.pdf", size: "2 Mo" },
-        { name: "Titre de séjour.jpg", size: "1.5 Mo" },
-      ]
-    },
-    {
-      title: "Candidature",
-      theme: "white",
-      items: [
-        { name: "CV.pdf", size: "3 Mo" },
-        { name: "Lettre de motivation.pdf", size: "2 Mo" },
-        { name: "Justificatif de domicile.pdf", size: "3 Mo" },
-      ]
-    },
-    {
-      title: "Diplômes",
-      theme: "white",
-      items: [
-        { name: "Diplôme de Baccalauréat.pdf", size: "2.5 Mo" },
-        { name: "Attestation PSC1.pdf", size: "1.2 Mo" },
-      ]
-    }
-  ]
-
   const userInfo = [
     { icon: Cake, label: "Âge", value: "Non renseigné" },
-    { icon: MapPin, label: "Adresse", value: user?.organization?.name || "Non renseignée" },
+    { icon: MapPin, label: "Caserne", value: user?.organization?.name || "Non renseignée" },
     { icon: AtSign, label: "Email", value: user?.email || "-" },
     { icon: Briefcase, label: "Métier", value: "Candidat" },
-    { icon: Calendar, label: "Candidature", value: "En cours" },
+    {
+      icon: Calendar,
+      label: "Candidature",
+      value: candidature ? STATUS_LABEL[candidature.status] : "Aucune",
+    },
   ]
 
   const initials = (user?.firstName?.[0] || "") + (user?.lastName?.[0] || "")
+
+  // Document sections — vides car aucun système de documents n'existe encore
+  const sections = [
+    { title: "Vos résultats", theme: "blue", items: [] },
+    { title: "Documents personnels", theme: "white", items: [] },
+    { title: "Candidature", theme: "white", items: [] },
+    { title: "Diplômes", theme: "white", items: [] },
+  ]
 
   return (
     <div className="min-h-screen bg-white p-8">
@@ -77,21 +83,21 @@ export default function DossierPage() {
         <h1 className="text-2xl font-bold text-[#132E49] mb-8">Dossier</h1>
 
         <div className="flex items-start gap-12">
-          {/* Profile Avatar */}
+          {/* Avatar */}
           <div className="relative">
             <div className="w-32 h-32 rounded-full overflow-hidden bg-[#7195AA]/60 flex items-center justify-center border-4 border-white shadow-sm">
               <span className="text-4xl font-bold text-white">{initials || '??'}</span>
             </div>
           </div>
 
-          {/* Profile Info */}
+          {/* Infos */}
           <div className="flex-1">
             <div className="flex items-center gap-4 mb-6">
               <h2 className="text-2xl font-bold text-[#132E49]">
                 {user?.firstName} {user?.lastName}
               </h2>
               <span className="px-3 py-1 bg-[#D3E1EB] text-[#132E49] text-xs font-bold rounded-md">
-                Dossier actif
+                {candidature ? 'Dossier actif' : 'Aucun dossier'}
               </span>
             </div>
 
@@ -121,35 +127,34 @@ export default function DossierPage() {
         {sections.map((section, idx) => (
           <div
             key={idx}
-            className={`rounded-3xl p-8 ${section.theme === 'blue' ? 'bg-[#EAF1F9]' : 'bg-white border border-gray-100 shadow-sm'
-              }`}
+            className={`rounded-3xl p-8 ${section.theme === 'blue' ? 'bg-[#EAF1F9]' : 'bg-white border border-gray-100 shadow-sm'}`}
           >
             <h3 className="text-lg font-bold text-[#132E49] mb-6">{section.title}</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {section.items.map((doc, docIdx) => (
-                <div
-                  key={docIdx}
-                  className="bg-white p-4 rounded-2xl flex items-center justify-between border border-gray-50 shadow-sm group hover:shadow-md transition-shadow"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-[#132E49] rounded-lg flex items-center justify-center shadow-sm">
-                      <FileIcon size={18} className="text-white" />
+            {section.items.length === 0 ? (
+              <p className="text-sm text-gray-400">Aucun document pour le moment.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {section.items.map((doc: { name: string; size: string }, docIdx) => (
+                  <div
+                    key={docIdx}
+                    className="bg-white p-4 rounded-2xl flex items-center justify-between border border-gray-50 shadow-sm group hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-[#132E49] rounded-lg flex items-center justify-center shadow-sm">
+                        <FileIcon size={18} className="text-white" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-[#132E49] leading-tight truncate max-w-[150px]">{doc.name}</p>
+                        <p className="text-xs text-gray-400 font-medium">{doc.size}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-bold text-[#132E49] leading-tight truncate max-w-[150px]">
-                        {doc.name}
-                      </p>
-                      <p className="text-xs text-gray-400 font-medium">
-                        {doc.size}
-                      </p>
-                    </div>
+                    <button className="p-2 text-[#132E49] hover:bg-gray-50 rounded-lg transition-colors">
+                      <Download size={20} />
+                    </button>
                   </div>
-                  <button className="p-2 text-[#132E49] hover:bg-gray-50 rounded-lg transition-colors">
-                    <Download size={20} />
-                  </button>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         ))}
       </div>

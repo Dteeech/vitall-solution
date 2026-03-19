@@ -80,7 +80,7 @@ model Candidature {
   id             String            @id @default(uuid())
   firstName      String
   lastName       String
-  email          String
+  email          String            @unique
   phone          String?
   cvUrl          String?
   status         CandidatureStatus @default(PENDING)

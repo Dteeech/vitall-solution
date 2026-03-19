@@ -1,6 +1,6 @@
 "use client"
 
-import { Filter, LayoutGrid, List, FileText, MessageSquare, MoreVertical } from "lucide-react"
+import { Filter, LayoutGrid, List, FileText, MessageSquare, MoreVertical, UserPlus } from "lucide-react"
 import { useState } from "react"
 import {
   DndContext,
@@ -14,6 +14,16 @@ import {
   useDraggable,
 } from "@dnd-kit/core"
 import type { Candidate } from "@/modules/recrutement/types"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
 
 const initialCandidates: Candidate[] = [
   { id: 1, name: "Martin Léo", status: "Nouvelle", date: "05/12/2025", location: "Saint-Herblain", documents: 12, comments: 0, description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore." },
@@ -54,11 +64,62 @@ const getStatusBadgeColor = (status: Candidate["status"]) => {
   }
 }
 
+type AddUserForm = {
+  firstName: string
+  lastName: string
+  email: string
+  role: "USER" | "ADMIN"
+  password: string
+}
+
 export default function CandidatesList() {
   const [candidates, setCandidates] = useState<Candidate[]>(initialCandidates)
   const [selectedCandidates, setSelectedCandidates] = useState<number[]>([])
   const [viewMode, setViewMode] = useState<"list" | "grid">("list")
   const [activeId, setActiveId] = useState<number | null>(null)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [formLoading, setFormLoading] = useState(false)
+  const [formError, setFormError] = useState<string | null>(null)
+  const [formSuccess, setFormSuccess] = useState(false)
+  const [form, setForm] = useState<AddUserForm>({
+    firstName: "",
+    lastName: "",
+    email: "",
+    role: "USER",
+    password: "",
+  })
+
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+
+  const handleAddUser = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setFormLoading(true)
+    setFormError(null)
+    try {
+      const res = await fetch("/api/organization/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      })
+      if (res.ok) {
+        setFormSuccess(true)
+        setTimeout(() => {
+          setDialogOpen(false)
+          setFormSuccess(false)
+          setForm({ firstName: "", lastName: "", email: "", role: "USER", password: "" })
+        }, 1500)
+      } else {
+        const data = await res.json()
+        setFormError(data.error || "Une erreur est survenue")
+      }
+    } catch {
+      setFormError("Une erreur est survenue")
+    } finally {
+      setFormLoading(false)
+    }
+  }
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -116,10 +177,19 @@ export default function CandidatesList() {
         <p className="text-neutral-600 text-sm mb-4">{candidates.length} candidatures</p>
 
         <div className="flex items-center justify-between gap-3 flex-col sm:flex-row">
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-secondary-900 text-white rounded-md hover:bg-secondary-800 transition-colors">
-            <Filter className="size-4" />
-            Filtrer
-          </button>
+          <div className="flex gap-2">
+            <button className="inline-flex items-center gap-2 px-4 py-2 bg-secondary-900 text-white rounded-md hover:bg-secondary-800 transition-colors">
+              <Filter className="size-4" />
+              Filtrer
+            </button>
+            <button
+              onClick={() => { setDialogOpen(true); setFormError(null); setFormSuccess(false) }}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-neutral-200 text-neutral-800 rounded-md hover:bg-neutral-50 transition-colors"
+            >
+              <UserPlus className="size-4" />
+              Ajouter un utilisateur
+            </button>
+          </div>
 
           <div className="flex gap-2">
             <button
@@ -143,6 +213,59 @@ export default function CandidatesList() {
           </div>
         </div>
       </div>
+
+      {/* Dialog ajout utilisateur */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Ajouter un utilisateur</DialogTitle>
+          </DialogHeader>
+          {formSuccess ? (
+            <div className="py-6 text-center text-green-600 font-medium">Utilisateur créé avec succès !</div>
+          ) : (
+            <form onSubmit={handleAddUser} className="space-y-4 py-2">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <Label htmlFor="firstName">Prénom</Label>
+                  <Input id="firstName" name="firstName" value={form.firstName} onChange={handleFormChange} required />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="lastName">Nom</Label>
+                  <Input id="lastName" name="lastName" value={form.lastName} onChange={handleFormChange} required />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" name="email" type="email" value={form.email} onChange={handleFormChange} required />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="password">Mot de passe</Label>
+                <Input id="password" name="password" type="password" value={form.password} onChange={handleFormChange} required />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="role">Rôle</Label>
+                <select
+                  id="role"
+                  name="role"
+                  value={form.role}
+                  onChange={handleFormChange}
+                  className="w-full border border-neutral-200 rounded-md px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-secondary-900"
+                >
+                  <option value="USER">Utilisateur</option>
+                  <option value="ADMIN">Administrateur</option>
+                </select>
+              </div>
+              {formError && <p className="text-sm text-red-500">{formError}</p>}
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Annuler</Button>
+                <Button type="submit" disabled={formLoading}>
+                  {formLoading ? "Création..." : "Créer"}
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {viewMode === "list" ? (
         /* Table View */
